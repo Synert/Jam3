@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEditor;
 using XInputDotNetPure;
 
 public class MultiInput : MonoBehaviour {

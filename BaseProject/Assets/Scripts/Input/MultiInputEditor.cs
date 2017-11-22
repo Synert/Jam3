@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿#if UNITY_EDITOR
+using UnityEngine;
 using UnityEngine.Events;
 using UnityEditor;
 using System.Collections.Generic;
@@ -639,3 +640,5 @@ public class MultiInputEditor : Editor {
 	}
 
 }
+
+#endif
