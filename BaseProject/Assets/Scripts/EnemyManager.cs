@@ -6,7 +6,7 @@ public class EnemyManager : MonoBehaviour {
 
 	//none of this exists yet, so it won't compile-
 	//should be fine once the other stuff's added
-	public GridBuilding GridManager;
+	//public GridBuilding GridManager;
 	public GameObject[] enemyList;
 	public float maxMult, minMult;
 
@@ -40,43 +40,43 @@ public class EnemyManager : MonoBehaviour {
 				if (breatherTime <= 0.0f)
 				{
 					//new wave
-					SpawnEnemies();
+					//SpawnEnemies();
 					waveEnded = false;
 				}
 			}
 		}
 	}
 
-	void SpawnEnemies()
-	{
-		for(int i = 0; i < GridManager.GetSegments(); i++)
-		{
-			int turrets = GridManager.GetTurrets(i);
-			int armour = GridManager.GetArmour(i);
-			int heightDiff = GridManager.GetSegments() - i;
-			float heightScalar = maxMult - heightDiff / 10.0f;
-			if(heightScalar < minMult)
-			{
-				heightScalar = minMult;
-			}
+	//void SpawnEnemies()
+	//{
+	//	for(int i = 0; i < GridManager.GetSegments(); i++)
+	//	{
+	//		int turrets = GridManager.GetTurrets(i);
+	//		int armour = GridManager.GetArmour(i);
+	//		int heightDiff = GridManager.GetSegments() - i;
+	//		float heightScalar = maxMult - heightDiff / 10.0f;
+	//		if(heightScalar < minMult)
+	//		{
+	//			heightScalar = minMult;
+	//		}
 
-			float enemies = 2 + turrets * 1.5f + armour * 1.0f;
-			enemies *= heightScalar;
+	//		float enemies = 2 + turrets * 1.5f + armour * 1.0f;
+	//		enemies *= heightScalar;
 
-			float segmentHeight = GridManager.GetSegmentHeight();
+	//		float segmentHeight = GridManager.GetSegmentHeight();
 
-			for(int j = 0; j < (int)enemies; j++)
-			{
-				int randomEnemy = Random.Range(0, enemyList.Length);
-				Transform newEnemy = Instantiate(enemyList[randomEnemy]);
+	//		for(int j = 0; j < (int)enemies; j++)
+	//		{
+	//			int randomEnemy = Random.Range(0, enemyList.Length);
+	//			Transform newEnemy = Instantiate(enemyList[randomEnemy]);
 
-				newEnemy.GetComponent<Enemy>().SetManager(this);
-				newEnemy.transform.position = new Vector3(-50.0f + Random.Range(0, 1) * 100.0f, segment * segmentHeight + Random.Range(0.0f, segmentHeight));
-				enemiesAlive++;
-			}
+	//			newEnemy.GetComponent<Enemy>().SetManager(this);
+	//			newEnemy.transform.position = new Vector3(-50.0f + Random.Range(0, 1) * 100.0f, segment * segmentHeight + Random.Range(0.0f, segmentHeight));
+	//			enemiesAlive++;
+	//		}
 
-		}
-	}
+	//	}
+	//}
 
 	public void RegisterDeath()
 	{
