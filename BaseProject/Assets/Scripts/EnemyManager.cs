@@ -6,85 +6,95 @@ public class EnemyManager : MonoBehaviour {
 	public GridBuilding GridManager;
 	public GameObject[] enemyList;
 	public float maxMult, minMult, turretScale, armourScale;
+	public float breather = 7.5f;
+	public float breatherMax = 10.0f;
 	public int segSize = 10;
 	public int baseEnemies = 2;
 
-	int enemiesAlive;
-	int currentWave;
-	bool waveEnded;
-	float breatherTime;
+	int[] enemiesAlive;
+	int[] currentWave;
+	bool[] waveEnded;
+	float[] breatherTime;
 
 	// Use this for initialization
 	void Start () {
-		enemiesAlive = 0;
-		waveEnded = true;
-		currentWave = 1;
-		breatherTime = 1.0f;
+		enemiesAlive = new int[512];
+		currentWave = new int[512];
+		waveEnded = new bool[512];
+		breatherTime = new float[512];
+		
+		for(int i = 0; i < 512; i++)
+		{
+			enemiesAlive[i] = 0;
+			waveEnded[i] = true;
+			currentWave[i] = 0;
+			breatherTime[i] = 1.0f;
+		}
 	}
 	
 	// Update is called once per frame
 	void Update () {
-		if(enemiesAlive <= 0)
+		for(int i = 0; i < GridManager.GetMaxHeight(); i+=segSize)
 		{
-			if (!waveEnded)
+			if(enemiesAlive[i] <= 0)
 			{
-				//wave has just ended
-				waveEnded = true;
-				breatherTime = 5 + 2.5f * currentWave;
-				currentWave++;
-			}
-			else if (breatherTime >= 0.0f)
-			{
-				breatherTime -= Time.deltaTime;
-				if (breatherTime <= 0.0f)
+				if (!waveEnded[i])
 				{
-					//new wave
-					SpawnEnemies();
-					waveEnded = false;
+					//wave has just ended
+					waveEnded[i] = true;
+					breatherTime[i] = Mathf.min(breatherMax, breather + currentWave * 0.75f);
+					currentWave[i]++;
+				}
+				else if (breatherTime[i] >= 0.0f)
+				{
+					breatherTime[i] -= Time.deltaTime;
+					if (breatherTime[i] <= 0.0f)
+					{
+						//new wave
+						SpawnEnemies(i);
+						waveEnded[i] = false;
+					}
 				}
 			}
 		}
 	}
 
-	void SpawnEnemies()
+	void SpawnEnemies(int seg)
 	{
-		for(int i = 0; i < GridManager.GetMaxHeight(); i+=segSize)
-		{
-			int turrets = GridManager.GetTurrets(new Vector2(i * segSize, (i * segSize) + segSize));
-			int armour = GridManager.GetArmour(new Vector2(i * segSize, (i * segSize) + segSize));
-			int heightDiff = GridManager.GetMaxHeight() - i;
-			float heightScalar = maxMult - heightDiff / 10.0f;
+		int turrets = GridManager.GetTurrets(new Vector2(seg, seg + segSize));
+		int armour = GridManager.GetArmour(new Vector2(seg, seg + segSize));
+		int heightDiff = GridManager.GetMaxHeight() - seg;
+		float heightScalar = maxMult - heightDiff / 10.0f;
 			
-			if(heightScalar < minMult)
-			{
-				heightScalar = minMult;
-			}
+		if(heightScalar < minMult)
+		{
+			heightScalar = minMult;
+		}
 
-			float enemies = baseEnemies + turrets * turretScale + armour * armourScale;
-			enemies *= heightScalar;
+		float enemies = baseEnemies + turrets * turretScale + armour * armourScale;
+		enemies *= heightScalar;
 
-			float segHeight = GridManager.GetSegmentHeight() * segSize;
+		float segHeight = GridManager.GetSegmentHeight() * segSize;
 
-			for(int j = 0; j < (int)enemies; j++)
-			{
-				int randomEnemy = Random.Range(0, enemyList.Length);
-				Transform newEnemy = Instantiate(enemyList[randomEnemy]);
+		for(int i = 0; i < (int)enemies; i++)
+		{
+			int randomEnemy = Random.Range(0, enemyList.Length);
+			Transform newEnemy = Instantiate(enemyList[randomEnemy]);
 				
-				int direction = 1 - Random.Range(0, 1) * 2;
+			int direction = 1 - Random.Range(0, 1) * 2;
 				
-				newEnemy.GetComponent<enemyBehaviour>().SetManager(this);
-				newEnemy.GetComponent<enemyBehaviour>().SetDirection(direction);
+			newEnemy.GetComponent<enemyBehaviour>().SetManager(this);
+			newEnemy.GetComponent<enemyBehaviour>().SetSegment(seg);
+			newEnemy.GetComponent<enemyBehaviour>().SetDirection(direction);
 				
-				newEnemy.transform.position = new Vector3(50.0f * direction, i * seg + Random.Range(0.0f, segHeight));
+			newEnemy.transform.position = new Vector3(50.0f * direction, seg * segHeight + Random.Range(0.0f, segHeight * segSize));
 				
-				enemiesAlive++;
-			}
-
+			enemiesAlive[seg]++;
 		}
 	}
 
-	public void RegisterDeath()
+	public void RegisterDeath(int segment)
 	{
-		enemiesAlive--;
+		enemiesAlive[segment]--;
 	}
 }
