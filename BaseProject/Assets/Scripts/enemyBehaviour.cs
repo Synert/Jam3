@@ -7,6 +7,8 @@ public class enemyBehaviour : MonoBehaviour
 
     public GameObject bulletPrefab;
     public int m_direction = -1;
+	
+	EnemyManager m_manager;
 
     Transform myGun;
     Transform targetTransform;
@@ -180,7 +182,14 @@ public class enemyBehaviour : MonoBehaviour
         //Instantiate(ScrapType1, transform.position, transform.rotation);
         //Instantiate(ScrapType2, transform.position, transform.rotation);
         //Instantiate(ScrapType3, transform.position, transform.rotation);
-
+		
+		m_manager.RegisterDeath();
+		
         Destroy(gameObject);
     }
+	
+	public void SetManager(EnemyManager set)
+	{
+		m_manager = set;
+	}
 }
