@@ -140,7 +140,6 @@ public class enemyBehaviour : MonoBehaviour
        
         if(targetAcquired == false)
         {
-            
             step = speed * Time.deltaTime;
             m_destination = new Vector2(transform.position.x + (20 * m_direction), transform.position.y);
             transform.position = Vector3.MoveTowards(transform.position, m_destination, step);
