@@ -4,17 +4,31 @@ using UnityEngine;
 
 public class enemyBehaviour : MonoBehaviour
 {
+
+    public GameObject bulletPrefab;
+    public int m_direction = -1;
+
     Transform myGun;
     Transform targetTransform;
     Vector2 m_destination;
-
-    int m_direction = -1; 
+    Vector3 theScale;
+ 
     int towerMask = 1 << 8;
+    int enemyMask = 1 << 9;
+    int health = 3;
 
+    bool isAlive = true;
     bool targetAcquired = false;
     float speed = 2.0f;
     float step = 0.0f;
 
+    float bulletSpeed = 5.0f;
+    float counter = 1;
+
+    bool friendlyAbove = false;
+    bool friendlyBelow = false;
+
+    bool firstPass = true;
     // Use this for initialization
     void Start ()
     {  
@@ -24,18 +38,23 @@ public class enemyBehaviour : MonoBehaviour
             {
                 myGun = child;
             }
-        }
+        } 
     }
-	
-	// Update is called once per frame
-	void Update ()
+
+    // Update is called once per frame
+    void Update()
     {
-        if(targetAcquired == false)
+        if (isAlive)
         {
-            getTarget();
+            transform.localScale = new Vector3(-m_direction, transform.localScale.y, transform.localScale.z);
+
+            if (targetAcquired == false)
+            {
+                getTarget();
+            }
+
+            Movement();
         }
-       
-        Movement();
     }
 
     void getTarget()
@@ -56,10 +75,41 @@ public class enemyBehaviour : MonoBehaviour
 
     void Movement()
     {
+        counter -= Time.deltaTime;
+
         if (targetAcquired)
         {
             RaycastHit2D hit = Physics2D.Raycast(myGun.transform.position, myGun.transform.up * -m_direction, 3.0f, towerMask);
-            if(hit == false)
+    
+            RaycastHit2D hitAbove = Physics2D.Raycast(new Vector2(transform.position.x, transform.position.y + 0.5f), transform.up * 1, 1.0f, enemyMask);
+            RaycastHit2D hitBelow = Physics2D.Raycast(new Vector2(transform.position.x, transform.position.y - 0.5f), transform.up * -1, 1.0f, enemyMask);
+            RaycastHit2D hitFront = Physics2D.Raycast(new Vector2(transform.position.x + 1f * m_direction, transform.position.y), transform.right * m_direction, 1.0f, enemyMask);
+
+            Debug.DrawLine(new Vector2(transform.position.x, transform.position.y + 0.5f), transform.position + (transform.up * 1));
+            Debug.DrawLine(new Vector2(transform.position.x, transform.position.y - 0.5f), transform.position + (transform.up * -1));
+            Debug.DrawLine(new Vector2(transform.position.x - 1f, transform.position.y), transform.position + (transform.right * -2));
+
+
+            if (hitAbove == true)
+            {
+                step = speed * Time.deltaTime;
+                transform.position = Vector3.MoveTowards(transform.position, new Vector2(transform.position.x, transform.position.y - 0.5f), step);
+            }
+
+            if(hitBelow == true)
+            {
+                step = speed * Time.deltaTime;
+                transform.position = Vector3.MoveTowards(transform.position, new Vector2(transform.position.x, transform.position.y + 0.5f), step);
+            }
+
+            if(hitFront == true)
+            {
+                step = speed * Time.deltaTime;
+                transform.position = Vector3.MoveTowards(transform.position, new Vector2(transform.position.x, transform.position.y + 0.5f), step);
+            }
+
+
+            if (hit == false)
             {
                 if (!(targetTransform.position.y == myGun.transform.position.y))
                 {
@@ -77,12 +127,15 @@ public class enemyBehaviour : MonoBehaviour
                 }
             }
             
-            if(hit == true && Mathf.Abs(myGun.transform.position.y - targetTransform.position.y) < 0.75)
+            if(hit == true)
             {
                 Debug.Log("Shooting");
-                shoot();
+                if (counter <= 0)
+                {
+                    shoot();
+                    counter = 1;
+                }
             }
-
         } 
        
         if(targetAcquired == false)
@@ -97,6 +150,9 @@ public class enemyBehaviour : MonoBehaviour
     void shoot()
     {
         Debug.Log("Bang");
+        var bullet = (GameObject)Instantiate(bulletPrefab, myGun.position, myGun.rotation);
+        bullet.GetComponent<Rigidbody2D>().velocity = new Vector2(5.0f * m_direction, 0);
+        Destroy(bullet, 2.0f);
     }
 
     public void SetDirection(int direction)
@@ -107,5 +163,25 @@ public class enemyBehaviour : MonoBehaviour
     public int GetDirection()
     {
         return m_direction;
+    }
+
+    public void takeDamage()
+    {
+        //Damage recieved from turret removes HP
+
+        if (health <= 0)
+        {
+            isAlive = false;
+            Death();
+        }
+    }
+
+    void Death()
+    {
+        //Instantiate(ScrapType1, transform.position, transform.rotation);
+        //Instantiate(ScrapType2, transform.position, transform.rotation);
+        //Instantiate(ScrapType3, transform.position, transform.rotation);
+
+        Destroy(gameObject);
     }
 }
