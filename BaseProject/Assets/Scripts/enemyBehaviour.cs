@@ -182,8 +182,9 @@ public class enemyBehaviour : MonoBehaviour
         //Instantiate(ScrapType1, transform.position, transform.rotation);
         //Instantiate(ScrapType2, transform.position, transform.rotation);
         //Instantiate(ScrapType3, transform.position, transform.rotation);
-		
-		m_manager.RegisterDeath();
+
+		//JOSH COMMENTED THIS OUT
+		//m_manager.RegisterDeath();
 		
         Destroy(gameObject);
     }
