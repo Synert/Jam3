@@ -9,6 +9,7 @@ public class enemyBehaviour : MonoBehaviour
     public int m_direction = -1;
 	
 	EnemyManager m_manager;
+	int m_seg;
 
     Transform myGun;
     Transform targetTransform;
@@ -183,8 +184,7 @@ public class enemyBehaviour : MonoBehaviour
         //Instantiate(ScrapType2, transform.position, transform.rotation);
         //Instantiate(ScrapType3, transform.position, transform.rotation);
 
-		//JOSH COMMENTED THIS OUT
-		//m_manager.RegisterDeath();
+		m_manager.RegisterDeath(m_seg);
 		
         Destroy(gameObject);
     }
@@ -192,5 +192,10 @@ public class enemyBehaviour : MonoBehaviour
 	public void SetManager(EnemyManager set)
 	{
 		m_manager = set;
+	}
+	
+	public void SetSegment(int set)
+	{
+		m_seg = set;
 	}
 }

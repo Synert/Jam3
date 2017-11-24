@@ -42,8 +42,7 @@ public class EnemyManager : MonoBehaviour {
 				{
 					//wave has just ended
 					waveEnded[i] = true;
-					//JOSH COMMENTED THIS OUT
-					//breatherTime[i] = Mathf.Min(breatherMax, breather + currentWave * 0.75f);
+					breatherTime[i] = Mathf.Min(breatherMax, breather + currentWave[i] * 0.75f);
 					currentWave[i]++;
 				}
 				else if (breatherTime[i] >= 0.0f)
@@ -85,8 +84,7 @@ public class EnemyManager : MonoBehaviour {
 			int direction = 1 - Random.Range(0, 1) * 2;
 				
 			newEnemy.GetComponent<enemyBehaviour>().SetManager(this);
-			//JOSH COMMENTED THIS OUT
-			//newEnemy.GetComponent<enemyBehaviour>().SetSegment(seg);
+			newEnemy.GetComponent<enemyBehaviour>().SetSegment(seg);
 			newEnemy.GetComponent<enemyBehaviour>().SetDirection(direction);
 				
 			newEnemy.transform.position = new Vector3(50.0f * direction, seg * segHeight + Random.Range(0.0f, segHeight * segSize));
