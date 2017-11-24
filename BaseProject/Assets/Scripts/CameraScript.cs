@@ -5,7 +5,7 @@ using UnityEngine;
 public class CameraScript : MonoBehaviour {
 	
 	public GridBuilding GridManager;
-	float r_trigger, l_trigger;
+	public float speed = 5.0f;
 	
 	// Use this for initialization
 	void Start () {
@@ -16,6 +16,8 @@ public class CameraScript : MonoBehaviour {
 	void Update () {
 		//to-do: lerp towards new position? mostly useful for the snapping
 		//map controls in multi-input
+
+		speed = GridManager.GetMaxHeight ();
 		
 		Vector3 tempPos = transform.position;
 		
@@ -23,9 +25,9 @@ public class CameraScript : MonoBehaviour {
 		{
 			tempPos.y = 0;
 		}
-		if(tempPos.y > GridManager.GetMaxHeight() * GridManager.SegmentHeight())
+		if(tempPos.y > GridManager.GetMaxHeight() * GridManager.GetSegmentHeight())
 		{
-			tempPos.y = GridManager.GetMaxHeight() * GridManager.SegmentHeight();
+			tempPos.y = GridManager.GetMaxHeight() * GridManager.GetSegmentHeight();
 		}
 		
 		transform.position = tempPos;
@@ -35,13 +37,9 @@ public class CameraScript : MonoBehaviour {
 	void TriggerInput(variableData _var)
     {
 		Vector3 tempPos = transform.position;
-		float speed = 5.0f;
 		
-        r_trigger = _var.state.TriggerRight.input;
-		l_trigger = _var.state.TriggerLeft.input;
-		
-		tempPos.y += r_trigger * speed * Time.deltaTime;
-		tempPos.y -= l_trigger * speed * Time.deltaTime;
+		tempPos.y += _var.state.TriggerRight.input * speed * Time.deltaTime;
+		tempPos.y -= _var.state.TriggerLeft.input * speed * Time.deltaTime;
 		
 		transform.position = tempPos;
     }
@@ -50,7 +48,7 @@ public class CameraScript : MonoBehaviour {
 	void SnapTop()
 	{
 		Vector3 tempPos = transform.position;
-		tempPos.y = GridManager.GetMaxHeight() * GridManager.SegmentHeight();
+		tempPos.y = GridManager.GetMaxHeight() * GridManager.GetSegmentHeight();
 		transform.position = tempPos;
 	}
 	

@@ -10,7 +10,9 @@ public class GridBuilding : MonoBehaviour {
 	public List<gridSection> grid = new List<gridSection> ();
 	public GameObject obj;
 	public bool enableLineRenderer = false;
-	public int maxHeight = -int.MaxValue;
+	public int maxHeight = 0;
+	public Vector2I ground;
+	public int maxDropBeforeDeath = 10;
 
 	// Use this for initialization
 	void Start () {
@@ -49,35 +51,48 @@ public class GridBuilding : MonoBehaviour {
 	void Update () {
 		GetComponent<LineRenderer> ().enabled = enableLineRenderer;
 		if (Input.GetMouseButton (0)) {
-			int temp = test ();
+			int temp = test (Camera.main.ScreenToWorldPoint (Input.mousePosition));
 			if (temp != -1) {
 				if (grid [temp].full == false) {
-					createObj (temp, obj);
+					createObj (temp, obj, true, true);
+					GameObject.FindObjectOfType<checkWithinCamera> ().testSections ();
 				}
 			}
 		}
 		if (Input.GetMouseButton (1)) {
-			int temp = test ();
+			int temp = test (Camera.main.ScreenToWorldPoint (Input.mousePosition));
 			if (temp != -1) {
-				if (grid [temp].indexAB.y >= maxHeight) {
-					//maxHeight = findMaxHeight (temp);
-				}
 				if (grid [temp].full == true) {
 					destroyObjsAbove (temp);
-					//destroyObj(temp);
+					GameObject.FindObjectOfType<checkWithinCamera> ().testSections ();
 				}
 			}
 		}
 		if (Input.GetMouseButtonDown (2)) {
+			/*
 			fillHole ();
+			GameObject.FindObjectOfType<checkWithinCamera> ().testSections ();
+			*/
+			int temp = test (Camera.main.ScreenToWorldPoint (Input.mousePosition));
+			if (temp != -1) {
+				if (grid [temp].full == false) {
+					createObj (temp, obj, false, false);
+					GameObject.FindObjectOfType<checkWithinCamera> ().testSections ();
+				}
+			}
 		}
 	}
 
-	void findMaxHeight (int _index) {
-		checkSidesData temp = checkSides (_index);
+	void findMaxHeight () {
+		List<gridSection> floor = new List<gridSection> ();
+		for (int a = 0; a < gridSections.x; a++) {
+			floor.Add (grid [a * gridSections.y]);
+		}
 
-		if (temp.down) {
+		maxHeight = 0;
 
+		if (floor.Count != 0) {
+			maxHeight = findHighest (floor);
 		}
 	}
 
@@ -85,7 +100,7 @@ public class GridBuilding : MonoBehaviour {
 
 		checkSidesData temp = checkSides (_index);
 		List<gridSection> tempSections = new List<gridSection> ();
-		int highestReached = 0;
+		int needTestHeight = 0;
 
 		destroyObj (_index);
 
@@ -93,8 +108,11 @@ public class GridBuilding : MonoBehaviour {
 			if (grid [temp.leftIndex].full) {
 				if (!findGround (grid [temp.leftIndex])) {
 					List<gridSection> above = gatherSpaces (new findOptionsOpenClosed (true), grid [temp.leftIndex]);
+					if (above.Count >= maxDropBeforeDeath) {
+						Debug.Log ("Death");
+					}
 					for (int a = 0; a < above.Count; a++) {
-						destroyObj (above [a].index);
+						needTestHeight += destroyObj (above [a].index);
 					}
 				}
 			}
@@ -105,8 +123,11 @@ public class GridBuilding : MonoBehaviour {
 			if (grid [temp.rightIndex].full) {
 				if (!findGround (grid [temp.rightIndex])) {
 					List<gridSection> above = gatherSpaces (new findOptionsOpenClosed (true), grid [temp.rightIndex]);
+					if (above.Count >= maxDropBeforeDeath) {
+						Debug.Log ("Death");
+					}
 					for (int a = 0; a < above.Count; a++) {
-						destroyObj (above [a].index);
+						needTestHeight += destroyObj (above [a].index);
 					}
 				}
 			}
@@ -117,8 +138,11 @@ public class GridBuilding : MonoBehaviour {
 			if (grid [temp.upIndex].full) {
 				if (!findGround (grid [temp.upIndex])) {
 					List<gridSection> above = gatherSpaces (new findOptionsOpenClosed (true), grid [temp.upIndex]);
+					if (above.Count >= maxDropBeforeDeath) {
+						Debug.Log ("Death");
+					}
 					for (int a = 0; a < above.Count; a++) {
-						destroyObj (above [a].index);
+						needTestHeight += destroyObj (above [a].index);
 					}
 				}
 			}
@@ -128,53 +152,62 @@ public class GridBuilding : MonoBehaviour {
 			if (grid [temp.downIndex].full) {
 				if (!findGround (grid [temp.downIndex])) {
 					List<gridSection> above = gatherSpaces (new findOptionsOpenClosed (true), grid [temp.downIndex]);
+					if (above.Count >= maxDropBeforeDeath) {
+						Debug.Log ("Death");
+					}
 					for (int a = 0; a < above.Count; a++) {
-						destroyObj (above [a].index);
+						needTestHeight += destroyObj (above [a].index);
 					}
 				}
 			}
 		}
 
+		if (needTestHeight > 0 || grid[_index].indexAB.y >= maxHeight) {
+			findMaxHeight ();
+		}
+
 	}
 
-	bool checkBlockPlaceAvailable(int _index, bool testCase) {
+	bool checkBlockPlaceAvailable(int _index, bool testCase, bool solidTestCase) {
 		checkSidesData temp = checkSides(_index);
 
 		if (temp.left) {
-			if (grid [temp.leftIndex].full == testCase) {
+			if (grid [temp.leftIndex].full == testCase && grid [temp.leftIndex].isSolid == solidTestCase) {
 				return true;
 			}
 		}
 
 		if (temp.right) {
-			if (grid [temp.rightIndex].full == testCase) {
+			if (grid [temp.rightIndex].full == testCase && grid [temp.rightIndex].isSolid == solidTestCase) {
 				return true;
 			}
 		}
 
 		if (temp.up) {
-			if (grid [temp.upIndex].full == testCase) {
+			if (grid [temp.upIndex].full == testCase && grid [temp.upIndex].isSolid == solidTestCase) {
 				return true;
 			}
 		}
 
 		if (temp.down) {
-			if (grid [temp.downIndex].full == testCase) {
+			if (grid [temp.downIndex].full == testCase && grid [temp.downIndex].isSolid == solidTestCase) {
 				return true;
 			}
 		}
 
-		return grid[_index].indexAB.y == 0;
+		return grid [_index].indexAB.y == 0;
 	}
 
-	void createObj(int _index, GameObject _obj) {
-		if (checkBlockPlaceAvailable(_index, true)) {
+	void createObj(int _index, GameObject _obj, bool _isSolid, bool _breakable, bool force = false) {
+		if (checkBlockPlaceAvailable(_index, true, true) || force) {
 			if (grid [_index].full) {
 				destroyObj (_index);
 			}
 			if (grid [_index].indexAB.y > maxHeight) {
 				maxHeight = grid [_index].indexAB.y;
 			}
+			grid [_index].breakable = _breakable;
+			grid [_index].isSolid = _isSolid;
 			grid [_index].full = true;
 			grid [_index].obj = GameObject.Instantiate (_obj, new Vector3 (grid [_index].xy.x, grid [_index].xy.y, 0), transform.rotation);
 			grid [_index].obj.GetComponent<SpriteRenderer> ().enabled = false;
@@ -182,24 +215,42 @@ public class GridBuilding : MonoBehaviour {
 		}
 	}
 
-	void destroyObj(int _index) {
+	int destroyObj(int _index) {
 		grid [_index].full = false;
 		if (grid [_index].obj) {
 			GameObject.Destroy (grid [_index].obj);
 		}
 		grid [_index].obj = null;
+		if (grid [_index].indexAB.y >= maxHeight) {
+			return 1;
+		}
+		return 0;
 	}
 
-	int test() {
-		Vector2 pos = Camera.main.ScreenToWorldPoint (Input.mousePosition);
+	public int test(Vector2 pos) {
 
 		int index = Mathf.FloorToInt(((pos.x + (size.x/2)) - startPos.x) / size.x) * gridSections.y + Mathf.FloorToInt(((pos.y + (size.y/2)) - startPos.y) / size.y);
 
-		if (pos.x < startPos.x - (size.x) ||
+		if (pos.x <= startPos.x - (size.x) ||
 			pos.x >= startPos.x + ((gridSections.x - 1) * size.x + (size.x / 2)) ||
-			pos.y < startPos.y - (size.y) ||
+			pos.y <= startPos.y - (size.y) ||
 			pos.y >= startPos.y + ((gridSections.y - 1) * size.y + (size.y / 2)) ||
-			index < 0 || index > grid.Count) {
+			index < 0 || index >= grid.Count) {
+			return -1;
+		}
+
+		return index;
+	}
+
+	public int testRaw(Vector2 pos) {
+
+		int index = Mathf.FloorToInt((pos.x - startPos.x) / size.x) * gridSections.y + Mathf.FloorToInt((pos.y - startPos.y) / size.y);
+
+		if (pos.x < startPos.x ||
+			pos.x >= startPos.x + (gridSections.x * size.x) ||
+			pos.y < startPos.y ||
+			pos.y >= startPos.y + (gridSections.y * size.y) ||
+			index < 0 || index >= grid.Count) {
 			return -1;
 		}
 
@@ -252,12 +303,12 @@ public class GridBuilding : MonoBehaviour {
 
 	void fillHole() {
 		GameObject objToChangeTo = null;
-		int temp = test ();
+		int temp = test (Camera.main.ScreenToWorldPoint (Input.mousePosition));
 		if (temp != -1) {
 			objToChangeTo = grid [temp].obj;
 			List<gridSection> sections = gatherSpaces (new findOptionsFill (objToChangeTo), grid[temp]);
 			for (int a = 0; a < sections.Count; a++) {
-				createObj (sections [a].index, obj);
+				createObj (sections [a].index, obj, true, true);
 			}
 		}
 	}
@@ -307,6 +358,12 @@ public class GridBuilding : MonoBehaviour {
 		return (grid [_index].full == testCase);
 	}
 
+	bool checkIndexSolid(int _index, bool testCase) {
+		//check grid spot open/full
+		grid [_index].check = false;
+		return (grid [_index].isSolid == testCase);
+	}
+
 	void checkIndexAdd(int _index, List<gridSection> queue, List<gridSection> checkd, bool testCase) {
 		//check grid spot open/full and add to queue if true
 		if (checkIndex (_index, testCase)) {
@@ -316,8 +373,43 @@ public class GridBuilding : MonoBehaviour {
 		}
 	}
 
+	void checkIndexAdd(int _index, List<gridSection> queue, List<gridSection> checkd, bool testCase, bool solidTestCase) {
+		//check grid spot open/full and add to queue if true
+		if (checkIndex (_index, testCase)) {
+			if (checkIndexSolid (_index, solidTestCase)) {
+				queue.Add (grid [_index]);
+				return;
+			}
+		}
+		checkd.Add (grid [_index]);
+	}
+
 	//check if sides are full/empty
 	void checkSidesLoop(List<gridSection> queue, List<gridSection> checkd, checkSidesData _data, bool testCase) {
+
+		//left
+		if (_data.left) {
+			checkIndexAdd (_data.leftIndex, queue, checkd, testCase);
+		}
+
+		//right
+		if (_data.right) {
+			checkIndexAdd (_data.rightIndex, queue, checkd, testCase);
+		}
+
+		//up
+		if (_data.up) {
+			checkIndexAdd (_data.upIndex, queue, checkd, testCase);
+		}
+
+		//down
+		if (_data.down) {
+			checkIndexAdd (_data.downIndex, queue, checkd, testCase);
+		}
+	}
+
+	//check if sides are full/empty and solid/not
+	void checkSidesLoop(List<gridSection> queue, List<gridSection> checkd, checkSidesData _data, bool testCase, bool solidTestCase) {
 
 		//left
 		if (_data.left) {
@@ -399,12 +491,20 @@ public class GridBuilding : MonoBehaviour {
 		checkd.Add (queue [0]);
 		queue.RemoveAt (0);
 	}
-		
+
 	List<gridSection> gatherSpaces(findOptions option, gridSection startSection) {
+		List<gridSection> temp = new List<gridSection> (1);
+		temp.Add (startSection);
+		return gatherSpaces (option, temp);
+	}
+		
+	List<gridSection> gatherSpaces(findOptions option, List<gridSection> startSection) {
 		List<gridSection> checkd = new List<gridSection> ();
 		List<gridSection> queue = new List<gridSection> ();
 
-		queue.Add (startSection);
+		for (int a = 0; a < startSection.Count; a++) {
+			queue.Add (startSection[a]);
+		}
 
 		List<gridSection> returnVal = new List<gridSection> ();
 
@@ -415,6 +515,15 @@ public class GridBuilding : MonoBehaviour {
 			while (queue.Count != 0) {
 				sideData = checkSides (queue [0].index);
 				checkSidesLoop (queue, checkd, sideData, testCase);
+				returnVal.Add (queue [0]);
+				finishedCheckingObject (queue, checkd);
+			}
+		} else if (option.type == findOption.findOpenClosedSolid) {
+			bool testCase = ((findOptionsOpenClosed)option).open;
+			bool testSolid = ((findOptionsOpenClosedSolid)option).isSolid;
+			while (queue.Count != 0) {
+				sideData = checkSides (queue [0].index);
+				checkSidesLoop (queue, checkd, sideData, testCase, testSolid);
 				returnVal.Add (queue [0]);
 				finishedCheckingObject (queue, checkd);
 			}
@@ -450,7 +559,7 @@ public class GridBuilding : MonoBehaviour {
 			}
 
 			sideData = checkSides (queue [0].index);
-			checkSidesLoop (queue, checkd, sideData, true);
+			checkSidesLoop (queue, checkd, sideData, true, true);
 			finishedCheckingObject (queue, checkd);
 		}
 
@@ -459,30 +568,31 @@ public class GridBuilding : MonoBehaviour {
 		return false;
 	}
 
-	int findHighest(List<gridSection> startSections, out int highestReached) {
+	int findHighest(List<gridSection> startSections) {
 		List<gridSection> checkd = new List<gridSection> ();
 		List<gridSection> queue = new List<gridSection> ();
 
 		for (int a = 0; a < startSections.Count; a++) {
-			queue.Add (startSections [a]);
+			if (startSections [a].full) {
+				queue.Add (startSections[a]);
+			}
 		}
 
-		highestReached = -1;
+		int highestReached = 0;
 
 		checkSidesData sideData = new checkSidesData();
 		while (queue.Count != 0) {
-			if (queue [0].indexAB.y > highestReached) {
+			if (queue [0].indexAB.y >= highestReached) {
 				highestReached = queue [0].indexAB.y;
 			}
 			sideData = checkSides (queue [0].index);
-			checkSidesLoop (queue, checkd, sideData, true);
+			checkSidesLoop (queue, checkd, sideData, true, true);
 			finishedCheckingObject (queue, checkd);
 		}
 
-
 		resetChecked (checkd);
 
-		return -1;
+		return highestReached;
 	}
 
 	public void resetPosition(int _index) {
@@ -493,29 +603,13 @@ public class GridBuilding : MonoBehaviour {
 
 }
 
-/*
-		else if (option.type == findOption.findGround) {
-			bool testCase = ((findOptionsOpenClosed)option).open;
-			while (queue.Count != 0) {
-				if (queue [0].indexAB.y == 0) {
-					resetChecked (checkd);
-					//return list with 1 value to act as true
-					List<gridSection> returnVal = new List<gridSection>();
-					returnVal.Add(queue [0]);
-					return returnVal;
-				}
-				sideData = checkSides (queue [0].index);
-				checkSidesLoop (queue, sideData, testCase);
-				finishedCheckingObject (queue, checkd);
-			}
-		}
-		*/
-
 [System.Serializable]
 public class gridSection 
 {
 	public Vector4 xy = Vector4.zero;
 	public bool full = false;
+	public bool isSolid = false;
+	public bool breakable = false;
 	public GameObject obj = null;
 	public int index;
 	public Vector2I indexAB;
@@ -551,6 +645,15 @@ public class findOptionsOpenClosed : findOptions {
 	public findOptionsOpenClosed(bool _open) {
 		open = _open;
 		type = findOption.findOpenClosed;
+	}
+}
+
+public class findOptionsOpenClosedSolid : findOptionsOpenClosed {
+	public bool isSolid;
+
+	public findOptionsOpenClosedSolid(bool _open, bool _isSolid) : base(_open) {
+		isSolid = _isSolid;
+		type = findOption.findOpenClosedSolid;
 	}
 }
 
