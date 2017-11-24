@@ -237,12 +237,7 @@ public class GridBuilding : MonoBehaviour {
 		return GetSegments (minMax, "Armour").Count;
 	}
 
-	public float GetSegmentHeight(int index) {
-		return size.y;
-	}
-
 	public float GetSegmentHeight() {
-		//temp to make connors shit work
 		return size.y;
 	}
 
