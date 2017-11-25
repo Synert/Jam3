@@ -15,7 +15,7 @@ public class TurretAttack : MonoBehaviour
 
     void OnTriggerStay2D(Collider2D col)
     {
-        if(col.CompareTag("Player"))
+        if(col.CompareTag("Enemy"))
         {
             if(isLeft)
             {

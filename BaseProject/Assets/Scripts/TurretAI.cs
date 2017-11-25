@@ -4,11 +4,6 @@ using UnityEngine;
 
 public class TurretAI : MonoBehaviour
 {
-    public int curHealth;
-    public int maxHealth;
-
-    public float distance;
-    public float wakerange;
     public float shootInterval;
     public float bulletSpeed = 100;
     public float bulletTimer;
@@ -17,13 +12,13 @@ public class TurretAI : MonoBehaviour
     public bool lookingRight = true;
 
     public GameObject bullet;
-    public Transform target;
+    public GameObject target;
     public Transform shootPointLeft;
     public Transform shootPointRight;
 
     void Start()
     {
-        curHealth = maxHealth;
+        target = GameObject.FindWithTag("Enemy");
     }
 
     void Update()
