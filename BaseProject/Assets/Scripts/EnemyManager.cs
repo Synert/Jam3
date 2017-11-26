@@ -103,5 +103,6 @@ public class EnemyManager : MonoBehaviour {
 	public void RegisterDeath(int segment)
 	{
 		enemiesAlive[segment]--;
+        Debug.Log(segment + " has died. Total left: " + enemiesAlive[segment]);
 	}
 }

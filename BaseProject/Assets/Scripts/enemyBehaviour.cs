@@ -32,9 +32,27 @@ public class enemyBehaviour : MonoBehaviour
     bool friendlyBelow = false;
 
     bool firstPass = true;
+
+    public int maxHealth;
+    bool isFriendly = false;
+
+    void OnTriggerEnter2D(Collider2D col)
+    {
+        if (col.tag == "Bullet")
+        {
+            if (col.GetComponent<BulletDestroy>().isFriendly != isFriendly)
+            {
+                health -= 1;
+                Destroy(col.gameObject);
+                takeDamage();
+            }
+        }
+    }
+
     // Use this for initialization
     void Start ()
-    {  
+    {
+        health = maxHealth;
         foreach (Transform child in transform)
         {
             if (child.name == "Gun")
@@ -171,7 +189,7 @@ public class enemyBehaviour : MonoBehaviour
     {
         //Damage recieved from turret removes HP
 
-        if (health <= 0)
+        if (health <= 0 && isAlive)
         {
             isAlive = false;
             Death();
