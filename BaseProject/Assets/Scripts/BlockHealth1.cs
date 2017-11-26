@@ -6,6 +6,7 @@ public class BlockHealth1 : MonoBehaviour
 {
     public int maxHealth;
     public int curHealth;
+	public bool isFriendly = false;
 
     void Start()
     {
@@ -24,8 +25,10 @@ public class BlockHealth1 : MonoBehaviour
     {
         if (col.tag == "Bullet")
         {
-            curHealth -= 1;
-            Destroy(col.gameObject);
+			if (col.GetComponent<BulletDestroy> ().isFriendly != isFriendly) {
+				curHealth -= 1;
+				Destroy (col.gameObject);
+			}
         }
     }
 }

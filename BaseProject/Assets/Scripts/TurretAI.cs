@@ -13,25 +13,59 @@ public class TurretAI : MonoBehaviour
 
     public GameObject bullet;
     public GameObject target;
-    public Transform shootPointLeft;
-    public Transform shootPointRight;
 
-    void Start()
-    {
-        target = GameObject.FindWithTag("Enemy");
-    }
+	public Transform rightSpawnLocation;
+	public Transform leftSpawnLocation;
+
+	public float viewDistance = 0;
+	float prevViewDistance = 0;
+	public Vector3 blockOffset;
+	public float distanceToTarget;
 
     void Update()
     {
-        if(target.transform.position.x > transform.position.x)
-        {
-            lookingRight = true;
-        }
-        if (target.transform.position.x < transform.position.x)
-        {
-            lookingRight = false;
-        }
+		if (prevViewDistance != viewDistance) {
+			GetComponent<CircleCollider2D> ().radius = viewDistance;
+			prevViewDistance = viewDistance;
+		}
+		if (target) {
+			if (target.transform.position.x > transform.position.x) {
+				lookingRight = true;
+			}
+			if (target.transform.position.x < transform.position.x) {
+				lookingRight = false;
+			}
+		}
     }
+
+	void OnTriggerStay2D(Collider2D col)
+	{
+		float currentDistanceToTarget = Vector2.Distance (col.transform.position, transform.position);
+		RaycastHit2D hit = Physics2D.Raycast (transform.position, col.transform.position - transform.position, currentDistanceToTarget);
+		if (hit.collider == col) {
+			if (target) {
+				if (col.CompareTag ("Enemy") && (currentDistanceToTarget < distanceToTarget || target == col.gameObject)) {
+					target = col.gameObject;
+					distanceToTarget = currentDistanceToTarget;
+					if (col.transform.position.x < transform.position.x) {
+						Attack (false);
+					} else {
+						Attack (true);
+					}
+				}
+			} else {
+				if (col.CompareTag ("Enemy")) {
+					target = col.gameObject;
+					distanceToTarget = currentDistanceToTarget;
+					if (col.transform.position.x < transform.position.x) {
+						Attack (false);
+					} else {
+						Attack (true);
+					}
+				}
+			}
+		}
+	}
 
     public void Attack(bool attackingRight)
     {
@@ -39,13 +73,18 @@ public class TurretAI : MonoBehaviour
 
         if (bulletTimer >= shootInterval)
         {
-            Vector2 direction = target.transform.position - transform.position;
+			Vector2 direction = Vector2.zero;
+			if (attackingRight) {
+				direction = target.transform.position - (transform.position + blockOffset);
+			} else {
+				direction = target.transform.position - (transform.position - blockOffset);
+			}
             direction.Normalize();
 
             if(!attackingRight)
             {
                 GameObject bulletClone;
-                bulletClone = Instantiate(bullet, shootPointLeft.transform.position, shootPointLeft.transform.rotation) as GameObject;
+				bulletClone = Instantiate(bullet, transform.position - blockOffset, transform.rotation) as GameObject;
                 bulletClone.GetComponent<Rigidbody2D>().velocity = direction * bulletSpeed;
 
                 bulletTimer = 0;
@@ -54,7 +93,7 @@ public class TurretAI : MonoBehaviour
             if(attackingRight)
             {
                 GameObject bulletClone;
-                bulletClone = Instantiate(bullet, shootPointRight.transform.position, shootPointRight.transform.rotation) as GameObject;
+				bulletClone = Instantiate(bullet, transform.position + blockOffset, transform.rotation) as GameObject;
                 bulletClone.GetComponent<Rigidbody2D>().velocity = direction * bulletSpeed;
 
                 bulletTimer = 0;

@@ -5,6 +5,7 @@ using UnityEngine;
 public enum findOption {
 	findOpenClosed = 0,
 	findOpenClosedSolid = 1,
-	findSimilar = 2,
-	findHighest = 3
+	findOpenClosedSolidIncludeSolidEdges = 2,
+	findSimilar = 3,
+	findHighest = 4
 }

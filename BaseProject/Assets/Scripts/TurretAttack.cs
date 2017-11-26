@@ -15,16 +15,32 @@ public class TurretAttack : MonoBehaviour
 
     void OnTriggerStay2D(Collider2D col)
     {
-        if(col.CompareTag("Enemy"))
-        {
-            if(isLeft)
-            {
-                turretAI.Attack(false);
-            }
-            else
-            {
-                turretAI.Attack(true);
-            }
-        }
+		if (turretAI.target) {
+			float currentDistanceToTarget = Vector2.Distance (col.transform.position, transform.position);
+			if (col.CompareTag ("Enemy") && (currentDistanceToTarget < turretAI.distanceToTarget || turretAI.target == col.gameObject)) {
+				turretAI.target = col.gameObject;
+				turretAI.distanceToTarget = currentDistanceToTarget;
+				if (isLeft) {
+					turretAI.Attack (false);
+				} else {
+					turretAI.Attack (true);
+				}
+			}
+		} else {
+			if(col.CompareTag("Enemy"))
+			{
+				turretAI.target = col.gameObject;
+				turretAI.distanceToTarget = Vector2.Distance (col.transform.position, transform.position);
+				if(isLeft)
+				{
+					turretAI.Attack(false);
+				}
+				else
+				{
+					turretAI.Attack(true);
+				}
+			}
+		}
+
     }
 }

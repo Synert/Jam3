@@ -49,14 +49,68 @@ public struct Vector2I
 		return (new Vector2I (Mathf.Abs (a.x + b.x), Mathf.Abs (a.y + b.y)));
 	}
 
+	//subtraction
 	public static Vector2I operator - (Vector2I a, Vector2I b)
 	{
 		return (new Vector2I(a.x - b.x, a.y - b.y));
 	}
 
+	public static Vector2 operator - (Vector2 a, Vector2I b)
+	{
+		return (new Vector2(a.x - b.x, a.y - b.y));
+	}
+
+	public static Vector2 operator - (Vector2I a, Vector2 b)
+	{
+		return (new Vector2(a.x - b.x, a.y - b.y));
+	}
+
+	//addition
 	public static Vector2I operator + (Vector2I a, Vector2I b)
 	{
 		return (new Vector2I(a.x + b.x, a.y + b.y));
+	}
+
+	public static Vector2 operator + (Vector2 a, Vector2I b)
+	{
+		return (new Vector2(a.x + b.x, a.y + b.y));
+	}
+
+	public static Vector2 operator + (Vector2I a, Vector2 b)
+	{
+		return (new Vector2(a.x + b.x, a.y + b.y));
+	}
+
+	//multiplication
+	public static Vector2I operator * (Vector2I a, Vector2I b)
+	{
+		return (new Vector2I(a.x * b.x, a.y * b.y));
+	}
+
+	public static Vector2 operator * (Vector2 a, Vector2I b)
+	{
+		return (new Vector2(a.x * b.x, a.y * b.y));
+	}
+
+	public static Vector2 operator * (Vector2I a, Vector2 b)
+	{
+		return (new Vector2(a.x * b.x, a.y * b.y));
+	}
+
+	//division
+	public static Vector2I operator / (Vector2I a, Vector2I b)
+	{
+		return (new Vector2I(a.x / b.x, a.y / b.y));
+	}
+
+	public static Vector2 operator / (Vector2 a, Vector2I b)
+	{
+		return (new Vector2(a.x / b.x, a.y / b.y));
+	}
+
+	public static Vector2 operator / (Vector2I a, Vector2 b)
+	{
+		return (new Vector2(a.x / b.x, a.y / b.y));
 	}
 
 	public static bool operator == (Vector2I a, Vector2I b)
