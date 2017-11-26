@@ -264,17 +264,27 @@ public class GridBuilding : MonoBehaviour {
 		List<gridSection> returnValue = new List<gridSection> ();
 		for (int a = 0; a <= minMax.y - minMax.x; a++) {
 			for (int b = 0; b < gridSections.y; b++) {
-				if (search == "") {
-					returnValue.Add (grid [((int)minMax.x + a) + (b * (int)gridSections.x)]);
-				} else {
-					if (grid [((int)minMax.x + a) + (b * (int)gridSections.x)].obj) {
-						if (grid [((int)minMax.x + a) + (b * (int)gridSections.x)].obj.GetComponent<BaseObject>()) {
-							if (grid [((int)minMax.x + a) + (b * (int)gridSections.x)].obj.GetComponent<BaseObject>().name == search) {
-								returnValue.Add (grid [((int)minMax.x + a) + (b * (int)gridSections.x)]);
-							}
-						}
-					}
-				}
+                int index = ((int)minMax.x + a) + (b * (int)gridSections.x);
+                if (index > 0 && index < grid.Count)
+                {
+                    if (search == "")
+                    {
+                        returnValue.Add(grid[index]);
+                    }
+                    else
+                    {
+                        if (grid[index].obj)
+                        {
+                            if (grid[index].obj.GetComponent<BaseObject>())
+                            {
+                                if (grid[index].obj.GetComponent<BaseObject>().name == search)
+                                {
+                                    returnValue.Add(grid[index]);
+                                }
+                            }
+                        }
+                    }
+                }
 			}
 		}
 		for (int a = 0; a < returnValue.Count; a++) {
@@ -526,68 +536,98 @@ public class GridBuilding : MonoBehaviour {
 		temp.Add (startSection);
 		return gatherSpaces (option, temp);
 	}
-		
-	List<gridSection> gatherSpaces(findOptions option, List<gridSection> startSection) {
-		List<gridSection> checkd = new List<gridSection> ();
-		List<gridSection> queue = new List<gridSection> ();
 
-		for (int a = 0; a < startSection.Count; a++) {
-			queue.Add (startSection[a]);
-		}
+    List<gridSection> gatherSpaces(findOptions option, List<gridSection> startSection)
+    {
+        List<gridSection> checkd = new List<gridSection>();
+        List<gridSection> queue = new List<gridSection>();
 
-		List<gridSection> returnVal = new List<gridSection> ();
+        for (int a = 0; a < startSection.Count; a++)
+        {
+            queue.Add(startSection[a]);
+        }
 
-		checkSidesData sideData = new checkSidesData();
+        List<gridSection> returnVal = new List<gridSection>();
+        List<gridSection> turrets = new List<gridSection>();
 
-		if (option.type == findOption.findOpenClosed) {
-			bool testCase = ((findOptionsOpenClosed)option).open;
-			while (queue.Count != 0) {
-				sideData = checkSides (queue [0].index);
-				checkSidesLoop (queue, checkd, sideData, testCase);
-				returnVal.Add (queue [0]);
-				finishedCheckingObject (queue, checkd);
-			}
-		} else if (option.type == findOption.findOpenClosedSolid) {
-			bool testCase = ((findOptionsOpenClosed)option).open;
-			bool testSolid = ((findOptionsOpenClosedSolid)option).isSolid;
-			while (queue.Count != 0) {
-				sideData = checkSides (queue [0].index);
-				checkSidesLoop (queue, checkd, sideData, testCase, testSolid);
-				returnVal.Add (queue [0]);
-				finishedCheckingObject (queue, checkd);
-			}
-		} else if (option.type == findOption.findOpenClosedSolidIncludeSolidEdges) {
-			bool testCase = ((findOptionsOpenClosedIncludeSolid)option).open;
-			while (queue.Count != 0) {
-				if (queue [0].isSolid) {
-					sideData = checkSides (queue [0].index);
-					checkSidesLoop (queue, checkd, sideData, testCase);
-					returnVal.Add (queue [0]);
-				} else {
-					sideData = checkSides (queue [0].index, true);
-					if (sidesOccupied (sideData) == 1) {
-						returnVal.Add (queue [0]);
-					}
-				}
-				finishedCheckingObject (queue, checkd);
-			}
-		} else if (option.type == findOption.findSimilar) {
-			GameObject testObj = ((findOptionsFill)option).obj;
-			while (queue.Count != 0) {
-				sideData = checkSides (queue [0].index);
-				checkSidesLoop (queue, checkd, sideData, testObj);
-				returnVal.Add (queue [0]);
-				finishedCheckingObject (queue, checkd);
-			}
-		} 
+        checkSidesData sideData = new checkSidesData();
 
-		resetChecked (checkd);
+        if (option.type == findOption.findOpenClosed)
+        {
+            bool testCase = ((findOptionsOpenClosed)option).open;
+            while (queue.Count != 0)
+            {
+                sideData = checkSides(queue[0].index);
+                checkSidesLoop(queue, checkd, sideData, testCase);
+                returnVal.Add(queue[0]);
+                finishedCheckingObject(queue, checkd);
+            }
+        }
+        else if (option.type == findOption.findOpenClosedSolid)
+        {
+            bool testCase = ((findOptionsOpenClosed)option).open;
+            bool testSolid = ((findOptionsOpenClosedSolid)option).isSolid;
+            while (queue.Count != 0)
+            {
+                sideData = checkSides(queue[0].index);
+                checkSidesLoop(queue, checkd, sideData, testCase, testSolid);
+                returnVal.Add(queue[0]);
+                finishedCheckingObject(queue, checkd);
+            }
+        }
+        else if (option.type == findOption.findOpenClosedSolidIncludeSolidEdges)
+        {
+            bool testCase = ((findOptionsOpenClosedIncludeSolid)option).open;
+            while (queue.Count != 0)
+            {
+                if (queue[0].isSolid)
+                {
+                    sideData = checkSides(queue[0].index);
+                    checkSidesLoop(queue, checkd, sideData, testCase);
+                    returnVal.Add(queue[0]);
+                }
+                else
+                {
+                    sideData = checkSides(queue[0].index, true);
+                    if (sidesOccupied(sideData) == 1)
+                    {
+                        returnVal.Add(queue[0]);
+                    }
+                    else
+                    {
+                        turrets.Add(queue[0]);
+                    }
+                }
+                finishedCheckingObject(queue, checkd);
+            }
+        }
+        else if (option.type == findOption.findSimilar)
+        {
+            GameObject testObj = ((findOptionsFill)option).obj;
+            while (queue.Count != 0)
+            {
+                sideData = checkSides(queue[0].index);
+                checkSidesLoop(queue, checkd, sideData, testObj);
+                returnVal.Add(queue[0]);
+                finishedCheckingObject(queue, checkd);
+            }
+        }
 
-		return returnVal;
+        resetChecked(checkd);
 
-	}
+        for (int a = 0; a < turrets.Count; a++)
+        {
+            if (!findGround(turrets[a]))
+            {
+                returnVal.Add(turrets[a]);
+            }
+        }
 
-	bool findGround(gridSection startSection) {
+        return returnVal;
+
+    }
+
+    bool findGround(gridSection startSection) {
 		List<gridSection> checkd = new List<gridSection> ();
 		List<gridSection> queue = new List<gridSection> ();
 

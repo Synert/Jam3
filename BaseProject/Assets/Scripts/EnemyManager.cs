@@ -5,7 +5,10 @@ using UnityEngine;
 public class EnemyManager : MonoBehaviour {
 	public GridBuilding GridManager;
 	public GameObject[] enemyList;
-	public float maxMult, minMult, turretScale, armourScale;
+    public float maxMult = 1.5f;
+    public float minMult = 0.75f;
+    public float turretScale = 1.25f;
+    public float armourScale = 1.0f;
 	public float breather = 7.5f;
 	public float breatherMax = 10.0f;
 	public int segSize = 10;
@@ -74,20 +77,24 @@ public class EnemyManager : MonoBehaviour {
 		float enemies = baseEnemies + turrets * turretScale + armour * armourScale;
 		enemies *= heightScalar;
 
-		float segHeight = GridManager.GetSegmentHeight() * segSize;
+        float segHeight = GridManager.GetSegmentHeight();
+        //segHeight /= 10.0f;
+
+        Vector3 origin = GridManager.startPos;
 
 		for(int i = 0; i < (int)enemies; i++)
 		{
 			int randomEnemy = Random.Range(0, enemyList.Length);
 			Transform newEnemy = Instantiate(enemyList[randomEnemy]).transform;
 				
-			int direction = 1 - Random.Range(0, 1) * 2;
+			int direction = 1 - (Random.Range(0, 2) * 2);
 				
 			newEnemy.GetComponent<enemyBehaviour>().SetManager(this);
 			newEnemy.GetComponent<enemyBehaviour>().SetSegment(seg);
-			newEnemy.GetComponent<enemyBehaviour>().SetDirection(direction);
-				
-			newEnemy.transform.position = new Vector3(50.0f * direction, seg * segHeight + Random.Range(0.0f, segHeight * segSize));
+			newEnemy.GetComponent<enemyBehaviour>().SetDirection(-direction);
+
+            newEnemy.transform.position = new Vector3(0.0f, seg * segHeight + Random.Range(0.0f, segHeight * segSize)) + origin;
+            newEnemy.transform.position = new Vector3(35.0f * direction, newEnemy.transform.position.y);
 				
 			enemiesAlive[seg]++;
 		}
