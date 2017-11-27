@@ -18,7 +18,7 @@ public class enemyBehaviour : MonoBehaviour
  
     int towerMask = 1 << 8;
     int enemyMask = 1 << 9;
-    int health = 3;
+    public int health = 3;
 
     bool isAlive = true;
     bool targetAcquired = false;
@@ -36,6 +36,7 @@ public class enemyBehaviour : MonoBehaviour
     public int maxHealth;
     bool isFriendly = false;
 
+	/*
     void OnTriggerEnter2D(Collider2D col)
     {
         if (col.tag == "Bullet")
@@ -48,6 +49,7 @@ public class enemyBehaviour : MonoBehaviour
             }
         }
     }
+    */
 
     // Use this for initialization
     void Start ()
@@ -190,13 +192,15 @@ public class enemyBehaviour : MonoBehaviour
         return m_direction;
     }
 
-    public void takeDamage()
+	public void takeDamage(int damage)
     {
         //Damage recieved from turret removes HP
+		health -= damage;
 
         if (health <= 0 && isAlive)
         {
             isAlive = false;
+			GetComponent<ScrapGenerator> ().CreateScrap ();
             Death();
         }
     }
@@ -207,7 +211,9 @@ public class enemyBehaviour : MonoBehaviour
         //Instantiate(ScrapType2, transform.position, transform.rotation);
         //Instantiate(ScrapType3, transform.position, transform.rotation);
 
-		m_manager.RegisterDeath(m_seg);
+		if (m_manager) {
+			m_manager.RegisterDeath (m_seg);
+		}
 		
         Destroy(gameObject);
     }

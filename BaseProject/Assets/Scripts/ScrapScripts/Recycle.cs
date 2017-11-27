@@ -1,11 +1,12 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Recycle : MonoBehaviour {
 
     GameObject m_stuff;
-    bool select = false;
+    public int Money = 0;
 	// Use this for initialization
 	void Start () {
 		
@@ -13,11 +14,14 @@ public class Recycle : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		
+		string temp = "Money: " + Money;
+		temp += ":: Height ";
+		temp += GameObject.FindObjectOfType<GridBuilding> ().maxHeight;
+		GameObject.FindObjectOfType<Text> ().text = temp;
 	}
-    void OnCollisionEnter2D(Collision2D col)
+
+	private void OnTriggerStay2D(Collider2D col)
     {
-        Debug.Log("Work");
         if (col.gameObject.tag == "Scrap")
         {
 
@@ -25,6 +29,7 @@ public class Recycle : MonoBehaviour {
             if(select.selected == true)
             {
                 Destroy(col.gameObject);
+                Money++;
             }
             
         }

@@ -15,23 +15,26 @@ public class ScrapGenerator : MonoBehaviour {
     // Use this for initialization
     void Start()
     {
-        dead = true;
+        
         Rigidbody2D = GetComponent<Rigidbody2D>();
+    
     }
 
     // Update is called once per frame
     void Update()
     {
+        if(GetComponent<enemyBehaviour>().health <= 0)
+        {
+            dead = true;
+        }
         if (dead == true && Num == 0)
         {
             CreateScrap();
-
-
-            Destroy(gameObject);
         }
        
     }
-    void CreateScrap()
+    
+	public void CreateScrap()
     {
         GameObject scrap = (GameObject)Instantiate(scrapPrefab, transform.position, Quaternion.identity);
         scrap.GetComponent<Rigidbody2D>().AddForce(transform.up * power);
