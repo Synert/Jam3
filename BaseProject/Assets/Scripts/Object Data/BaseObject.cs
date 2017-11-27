@@ -9,6 +9,7 @@ public class BaseObject : MonoBehaviour {
 	public int index;
 	public GridBuilding building;
 	public bool show = false;
+    public bool isFriendly = true;
 
 	void Start() {
 		building = GameObject.FindObjectOfType<GridBuilding> ();
@@ -25,4 +26,16 @@ public class BaseObject : MonoBehaviour {
 			GameObject.Destroy (this.gameObject);
 		}
 	}
+
+    void OnTriggerEnter2D(Collider2D col)
+    {
+        if (col.tag == "Bullet")
+        {
+            if (col.GetComponent<BulletDestroy>().isFriendly != isFriendly)
+            {
+                takeDamage(1);
+                Destroy(col.gameObject);
+            }
+        }
+    }
 }

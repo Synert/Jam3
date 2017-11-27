@@ -80,11 +80,11 @@ public class enemyBehaviour : MonoBehaviour
 
     void getTarget()
     {
-        Debug.DrawLine(myGun.transform.position, myGun.transform.position + (myGun.transform.up * -m_direction));
+        Debug.DrawLine(myGun.transform.position, myGun.transform.position + (myGun.transform.up * 20.0f));
 
         if (targetAcquired == false)
         {
-            RaycastHit2D hit = Physics2D.Raycast(myGun.transform.position, myGun.transform.up * -m_direction, 20.0f, towerMask);
+            RaycastHit2D hit = Physics2D.Raycast(myGun.transform.position, myGun.transform.up, 20.0f, towerMask);
             if (hit == true)
             {
                 Debug.Log("targetAcquired");
@@ -98,17 +98,22 @@ public class enemyBehaviour : MonoBehaviour
     {
         counter -= Time.deltaTime;
 
+        if(targetAcquired && targetTransform == null)
+        {
+            targetAcquired = false;
+        }
+
         if (targetAcquired)
         {
-            RaycastHit2D hit = Physics2D.Raycast(myGun.transform.position, myGun.transform.up * -m_direction, 3.0f, towerMask);
+            RaycastHit2D hit = Physics2D.Raycast(myGun.transform.position, myGun.transform.up, 5.0f, towerMask);
     
-            RaycastHit2D hitAbove = Physics2D.Raycast(new Vector2(transform.position.x, transform.position.y + 0.5f), transform.up * 1, 1.0f, enemyMask);
-            RaycastHit2D hitBelow = Physics2D.Raycast(new Vector2(transform.position.x, transform.position.y - 0.5f), transform.up * -1, 1.0f, enemyMask);
-            RaycastHit2D hitFront = Physics2D.Raycast(new Vector2(transform.position.x + 1f * m_direction, transform.position.y), transform.right * m_direction, 1.0f, enemyMask);
+            RaycastHit2D hitAbove = Physics2D.Raycast(new Vector2(transform.position.x, transform.position.y + 3f), transform.up, 3.0f, enemyMask);
+            RaycastHit2D hitBelow = Physics2D.Raycast(new Vector2(transform.position.x, transform.position.y - 3f), transform.up * -1, 3.0f, enemyMask);
+            RaycastHit2D hitFront = Physics2D.Raycast(new Vector2(transform.position.x + 4f * m_direction, transform.position.y), transform.right * m_direction, 1.0f, enemyMask);
 
-            Debug.DrawLine(new Vector2(transform.position.x, transform.position.y + 0.5f), transform.position + (transform.up * 1));
-            Debug.DrawLine(new Vector2(transform.position.x, transform.position.y - 0.5f), transform.position + (transform.up * -1));
-            Debug.DrawLine(new Vector2(transform.position.x - 1f, transform.position.y), transform.position + (transform.right * -2));
+            Debug.DrawLine(new Vector2(transform.position.x, transform.position.y + 3f), transform.position + (transform.up * 5));
+            Debug.DrawLine(new Vector2(transform.position.x, transform.position.y - 3f), transform.position + (transform.up * -5));
+            Debug.DrawLine(new Vector2(transform.position.x + 4f * m_direction, transform.position.y), transform.position + (transform.right * m_direction * 2.0f));
 
 
             if (hitAbove == true)
