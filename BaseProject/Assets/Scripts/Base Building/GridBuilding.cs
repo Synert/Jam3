@@ -490,7 +490,7 @@ public class GridBuilding : MonoBehaviour {
 
     public int GetTurrets(Vector2 minMax)
     {
-        return GetSegments(minMax, "Turret").Count;
+        return GetSegments(minMax, "Turret 1(Clone)").Count;
     }
 
     public int GetArmour(Vector2 minMax)

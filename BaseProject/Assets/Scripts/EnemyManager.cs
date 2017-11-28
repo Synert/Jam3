@@ -64,17 +64,24 @@ public class EnemyManager : MonoBehaviour {
 
 	void SpawnEnemies(int seg)
 	{
-		int turrets = GridManager.GetTurrets(new Vector2(seg, seg + segSize));
-		int armour = GridManager.GetArmour(new Vector2(seg, seg + segSize));
-		int heightDiff = GridManager.GetMaxHeight() - seg;
-		float heightScalar = maxMult - heightDiff / 10.0f;
+		float turrets = GridManager.GetTurrets(new Vector2(seg, seg + segSize));
+		float armour = GridManager.GetArmour(new Vector2(seg, seg + segSize));
+
+        turrets *= turretScale;
+        armour *= armourScale;
+
+        //number of segments between here and the top
+		int heightDiff = Mathf.FloorToInt(GridManager.GetMaxHeight() / segSize) - seg;
+
+        //number of segments between here and the top
+		float heightScalar = maxMult - (float)heightDiff / 10.0f;
 			
 		if(heightScalar < minMult)
 		{
 			heightScalar = minMult;
 		}
 
-		float enemies = baseEnemies + turrets * turretScale + armour * armourScale;
+		float enemies = baseEnemies + turrets + armour;
 		enemies *= heightScalar;
 
         float segHeight = GridManager.GetSegmentHeight();
@@ -93,8 +100,13 @@ public class EnemyManager : MonoBehaviour {
 			newEnemy.GetComponent<enemyBehaviour>().SetSegment(seg);
 			newEnemy.GetComponent<enemyBehaviour>().SetDirection(-direction);
 
-            newEnemy.transform.position = new Vector3(0.0f, seg * segHeight + Random.Range(0.0f, segHeight * segSize)) + origin;
-            newEnemy.transform.position = new Vector3(35.0f * direction, newEnemy.transform.position.y);
+            float maxHeight = GridManager.GetMaxHeight() * segHeight;
+
+            float newY = seg * segHeight + Random.Range(0.0f, segHeight * segSize);
+            newY = Mathf.Min(newY, maxHeight);
+
+            newEnemy.transform.position = new Vector3(0.0f, newY) + origin;
+            newEnemy.transform.position = new Vector3((45.0f + i * 6) * direction, newEnemy.transform.position.y);
 				
 			enemiesAlive[seg]++;
 		}
