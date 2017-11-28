@@ -6,33 +6,31 @@ using UnityEngine.SceneManagement;
 public class MainMenu : MonoBehaviour
 {
     public bool isStart;
-    public bool isControls;
+    public bool isHighscore;
     public bool isMainMenu;
     public bool isQuit;
 
+    public bool isPressed;
+
     public Color selectedColour;
 
-    void OnMouseUp()
+    public void ChangeScene()
     {
-        if (isStart)
-        {
-            GetComponent<Renderer>().material.color = new Color(1.0f, 1.0f, 0.5f);
-            SceneManager.LoadScene("GameScene");
-        }
-        if (isControls)
-        {
-            GetComponent<Renderer>().material.color = new Color(1.0f, 1.0f, 0.5f);
-            SceneManager.LoadScene("Controls");
-        }
-        if (isMainMenu)
-        {
-            GetComponent<Renderer>().material.color = new Color(1.0f, 1.0f, 0.5f);
-            SceneManager.LoadScene("Main Menu");
-        }
-        if (isQuit)
-        {
-            GetComponent<Renderer>().material.color = new Color(1.0f, 0.5f, 0.5f);
-            Application.Quit();
-        }
+            if (isStart)
+            {
+                SceneManager.LoadScene("GameScene");
+            }
+            if (isHighscore)
+            {
+                SceneManager.LoadScene("Highscore");
+            }
+            if (isMainMenu)
+            {
+                SceneManager.LoadScene("Main Menu");
+            }
+            if (isQuit)
+            {
+             Application.Quit();
+            }
     }
 }
