@@ -74,7 +74,7 @@ public class EnemyManager : MonoBehaviour {
 		int heightDiff = Mathf.FloorToInt(GridManager.GetMaxHeight() / segSize) - seg;
 
         //number of segments between here and the top
-		float heightScalar = maxMult - (float)heightDiff / 10.0f;
+		float heightScalar = maxMult + (float)heightDiff / 10.0f;
 			
 		if(heightScalar < minMult)
 		{
