@@ -6,6 +6,7 @@ public class MoveCursor : MonoBehaviour {
 
 	public List<Scrap> scrap = new List<Scrap>();
 	public float maxDistSide = 0;
+	public float maxYDown = 0;
 
     void takeInputs(variableData data)
     {
@@ -19,8 +20,8 @@ public class MoveCursor : MonoBehaviour {
 			transOffset.x = builder.startPos.x + (builder.gridSections.x - 1) * builder.size.x + maxDistSide;
 		}
 
-		if (transOffset.y < builder.startPos.y) {
-			transOffset.y = builder.startPos.y;
+		if (transOffset.y < builder.startPos.y - maxYDown) {
+			transOffset.y = builder.startPos.y - maxYDown;
 		}
 
 		if (transOffset.y > builder.startPos.y + (builder.gridSections.y - 1) * builder.size.y) {

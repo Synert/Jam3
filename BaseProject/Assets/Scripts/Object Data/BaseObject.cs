@@ -11,6 +11,7 @@ public class BaseObject : MonoBehaviour {
 	public bool show = false;
     public bool isFriendly = true;
     public float buildTime = 1.0f;
+	public int cost = 0;
     public bool build = true;
 
 	void Start() {
@@ -25,7 +26,7 @@ public class BaseObject : MonoBehaviour {
             if(buildTime <= 0.0f)
             {
                 build = false;
-                //building.setPositionSolid(index);
+				building.grid[index].canBuildApon = true;
             }
         }
     }
@@ -38,19 +39,18 @@ public class BaseObject : MonoBehaviour {
 	void testHealth() {
 		if (hp <= 0) {
 			building.resetPosition (index);
-			GameObject.Destroy (this.gameObject);
 		}
 	}
 
     void OnTriggerEnter2D(Collider2D col)
     {
-        if (col.tag == "Bullet")
-        {
-            if (col.GetComponent<BulletDestroy>().isFriendly != isFriendly)
-            {
-                takeDamage(1);
-                Destroy(col.gameObject);
-            }
-        }
+		if (name != "Turret") {
+			if (col.tag == "Bullet") {
+				if (col.GetComponent<BulletDestroy> ().isFriendly != isFriendly) {
+					takeDamage (1);
+					Destroy (col.gameObject);
+				}
+			}
+		}
     }
 }
