@@ -7,6 +7,8 @@ public class MouseHover : MonoBehaviour
     public AudioSource ButtonPress;
     public AudioClip Button;
 
+    public Color hoverColour;
+
     void Start()
     {
         GetComponent<Renderer>().material.color = Color.white;
@@ -15,7 +17,7 @@ public class MouseHover : MonoBehaviour
 
     void OnMouseEnter()
     {
-        GetComponent<Renderer>().material.color = Color.green;
+        GetComponent<Renderer>().material.color = new Color(1.0f,0.5f,0.0f);
         ButtonPress.Play();
     }
 

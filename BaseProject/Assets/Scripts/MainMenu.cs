@@ -10,26 +10,28 @@ public class MainMenu : MonoBehaviour
     public bool isMainMenu;
     public bool isQuit;
 
+    public Color selectedColour;
+
     void OnMouseUp()
     {
         if (isStart)
         {
-            GetComponent<Renderer>().material.color = Color.cyan;
+            GetComponent<Renderer>().material.color = new Color(1.0f, 1.0f, 0.5f);
             SceneManager.LoadScene("GameScene");
         }
         if (isControls)
         {
-            GetComponent<Renderer>().material.color = Color.cyan;
+            GetComponent<Renderer>().material.color = new Color(1.0f, 1.0f, 0.5f);
             SceneManager.LoadScene("Controls");
         }
         if (isMainMenu)
         {
-            GetComponent<Renderer>().material.color = Color.cyan;
+            GetComponent<Renderer>().material.color = new Color(1.0f, 1.0f, 0.5f);
             SceneManager.LoadScene("Main Menu");
         }
         if (isQuit)
         {
-            GetComponent<Renderer>().material.color = Color.red;
+            GetComponent<Renderer>().material.color = new Color(1.0f, 0.5f, 0.5f);
             Application.Quit();
         }
     }
