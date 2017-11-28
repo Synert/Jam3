@@ -14,12 +14,38 @@ public class BaseObject : MonoBehaviour {
 	public int cost = 0;
     public bool build = true;
 
+    public LineRenderer m_line;
+    Vector3 bottom;
+    float initBuild;
+
+    bool doOnce = false;
+
 	void Start() {
 		building = GameObject.FindObjectOfType<GridBuilding> ();
-	}
+
+        //m_line = gameObject.AddComponent<LineRenderer>();
+        m_line = GetComponent<LineRenderer>();
+    }
 
     void Update()
     {
+        if(!doOnce)
+        {
+            bottom = transform.position;
+            bottom.y -= (transform.lossyScale.y) * 4.7f;
+            bottom.z = -5.0f;
+
+            m_line.SetPosition(0, bottom);
+            m_line.SetPosition(1, bottom);
+            initBuild = buildTime;
+
+            m_line.positionCount = 2;
+            m_line.SetColors(Color.red, Color.red);
+            m_line.SetWidth(3.0f, 3.0f);
+
+            doOnce = true;
+        }
+
         if(build)
         {
             buildTime -= Time.deltaTime;
@@ -27,6 +53,17 @@ public class BaseObject : MonoBehaviour {
             {
                 build = false;
 				building.grid[index].canBuildApon = true;
+                m_line.enabled = false;
+                m_line.SetWidth(0.25f, 0.25f);
+                m_line.SetColors(Color.yellow, Color.red);
+            }
+            else
+            {
+                float percentage = buildTime / initBuild;
+                Debug.Log(percentage);
+                m_line.SetPosition(1, new Vector3(bottom.x, bottom.y + percentage * 3.0f, -5.0f));
+                Color newCol = new Color(percentage, 1.0f - percentage, 0.0f, 0.7f);
+                m_line.SetColors(newCol, newCol);
             }
         }
     }
