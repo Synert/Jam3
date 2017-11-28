@@ -16,6 +16,8 @@ public class GridBuilding : MonoBehaviour {
 	public Vector2I ground;
 	public int maxDropBeforeDeath = 10;
 	public GameObject cursor;
+	public GameObject overlay;
+	public GameObject scrapPrefab;
 	public Gameover gameover;
 	public int state = 0;
 
@@ -96,7 +98,8 @@ public class GridBuilding : MonoBehaviour {
 					{
 						BuildArmour ();
 					}
-					if (currentObj == 2) {
+					if (currentObj == 2) 
+					{
 						BuildTurret();
 					}
 				}
@@ -235,6 +238,73 @@ public class GridBuilding : MonoBehaviour {
 				}
 			}
 
+		}
+
+		overlayScrap ();
+	}
+
+	void overlayScrap() {
+		int temp = test(cursor.transform.position);
+		if (temp != -1) {
+			if ((grid [temp].full && currentObj == 3) ||
+				(grid [temp].full != true && currentObj != 3)) {
+
+				if (currentObj == 3) {
+					overlay.GetComponent<SpriteRenderer> ().sprite = scrapPrefab.GetComponent<SpriteRenderer> ().sprite;
+					overlay.SetActive (true);
+				} else {
+					overlay.GetComponent<SpriteRenderer> ().sprite = obj [currentObj].GetComponent<SpriteRenderer> ().sprite;
+					if (currentObj != 2) {
+						if (checkBlockPlaceAvailable (temp, true, true, 0, true)) {
+							overlay.SetActive (true);
+							overlay.GetComponent<SpriteRenderer> ().color = Color.green;
+						} else {
+							overlay.SetActive (false);
+						}
+					} else {
+						if (checkBlockPlaceAvailable (temp, true, true, 1, false)) {
+							overlay.SetActive (true);
+							overlay.GetComponent<SpriteRenderer> ().color = Color.green;
+						} else {
+							overlay.SetActive (true);
+							overlay.GetComponent<SpriteRenderer> ().color = Color.red;
+						}
+					}
+				}
+
+				Vector3 rot = transform.rotation.eulerAngles;
+				int rotation = currentRotation;
+				rot.z = rotation * 90;
+				overlay.transform.rotation = Quaternion.Euler (rot);
+				overlay.transform.position = new Vector3(grid[temp].xy.x, grid[temp].xy.y, 0);
+
+				if (obj[currentObj].GetComponent<ObjectSpawningOffsets>())
+				{
+					//canBuildApon
+					Vector3 offset = obj[currentObj].GetComponent<ObjectSpawningOffsets>().offset;
+					float offsetTemp = 0;
+					switch (currentRotation) {
+					case 1:
+						offsetTemp = offset.y;
+						offset.y = -offset.x;
+						offset.x = -offsetTemp;
+						break;
+					case 2:
+						offset.y *= -1;
+						break;
+					case 3:
+						offsetTemp = offset.y;
+						offset.y = offset.x;
+						offset.x = offsetTemp;
+						break;
+					}
+					overlay.transform.position += offset;
+				}
+			} else {
+				overlay.SetActive (false);
+			}
+		} else {
+			overlay.SetActive (true);
 		}
 	}
 
@@ -458,21 +528,21 @@ public class GridBuilding : MonoBehaviour {
 				Vector3 offset = grid[_index].obj.GetComponent<ObjectSpawningOffsets>().offset;
 				float offsetTemp = 0;
 				switch (currentRotation) {
-				case 0:
-					offset.y *= -2;
-					break;
 				case 1:
 					offsetTemp = offset.y;
 					offset.y = -offset.x;
-					offset.x = -offsetTemp * 2;
+					offset.x = -offsetTemp;
+					break;
+				case 2:
+					offset.y *= -1;
 					break;
 				case 3:
 					offsetTemp = offset.y;
 					offset.y = offset.x;
-					offset.x = offsetTemp * 2;
+					offset.x = offsetTemp;
 					break;
 				}
-				grid[_index].obj.transform.position += grid[_index].obj.GetComponent<ObjectSpawningOffsets>().offset;
+				grid[_index].obj.transform.position += offset;
 			}
 
 			GameObject.FindObjectOfType<Recycle>().Money -= obj[currentObj].GetComponent<BaseObject>().cost;

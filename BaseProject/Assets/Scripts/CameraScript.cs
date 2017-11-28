@@ -6,10 +6,11 @@ public class CameraScript : MonoBehaviour {
 	
 	public GridBuilding GridManager;
 	public float speed = 5.0f;
-    public GameObject floor;
-    public GameObject RecycleBin;
+	public float lowestPoint = 0;
 	public GameObject cursor;
-    int n = 0;
+	public bool goToPos = false;
+	public Vector3 aimPos;
+	public bool lerpVsSnap;
     
 	// Use this for initialization
 	void Start () {
@@ -20,31 +21,22 @@ public class CameraScript : MonoBehaviour {
 	void Update () {
 		//to-do: lerp towards new position? mostly useful for the snapping
 		//map controls in multi-input
+		if (lerpVsSnap) {
+			if (goToPos) {
+				if (Vector2.Distance (transform.position, aimPos) < 1) {
+					goToPos = false;
+				} else {
+					transform.position = Vector3.Lerp (transform.position, aimPos, Time.deltaTime);
+					float yVal = Camera.main.transform.position.y - cursor.transform.position.y;
+					cursor.transform.position = new Vector3 (cursor.transform.position.x, Camera.main.transform.position.y - yVal, 0);
+				}
+			}
+		}
 
-		speed = GridManager.GetMaxHeight () + 1;
+		speed = GridManager.GetMaxHeight () + 5;
 		
 		Vector3 tempPos = transform.position;
-		
-		if(tempPos.y < -5)
-		{
-			tempPos.y = -5;
-		}
-		if(tempPos.y > GridManager.GetMaxHeight() * GridManager.GetSegmentHeight())
-		{
-			tempPos.y = GridManager.GetMaxHeight() * GridManager.GetSegmentHeight();
-		}
 
-		//floor.transform.position = tempPos - new Vector3(0, Camera.main.orthographicSize, 0);
-		transform.position = tempPos;
-       if(n == 0)
-        {
-            //RecycleBin = (GameObject)Instantiate(RecycleBin, tempPos, Quaternion.identity);
-            n++;
-        }
-       
-     	//recycle bin code
-		//RecycleBin.transform.position = tempPos - new Vector3(-GridManager.startPos.x + 4, Camera.main.orthographicSize-4, -10);
-        transform.position = tempPos;
     }
 	
 	void TriggerInput(variableData _var)
@@ -56,6 +48,20 @@ public class CameraScript : MonoBehaviour {
 		tempPos.y -= _var.state.TriggerLeft.input * speed * Time.deltaTime;
 		
 		transform.position = tempPos;
+
+		if(tempPos.y < lowestPoint)
+		{
+			tempPos.y = lowestPoint;
+			yVal = 0;
+		}
+		if(tempPos.y > GridManager.GetMaxHeight() * GridManager.GetSegmentHeight())
+		{
+			tempPos.y = GridManager.GetMaxHeight() * GridManager.GetSegmentHeight();
+			yVal = 0;
+		}
+
+		transform.position = tempPos;
+
 		cursor.transform.position = new Vector3 (cursor.transform.position.x, Camera.main.transform.position.y - yVal, 0);
     }
 	
@@ -65,8 +71,12 @@ public class CameraScript : MonoBehaviour {
 		float yVal = Camera.main.transform.position.y - cursor.transform.position.y;
 		Vector3 tempPos = transform.position;
 		tempPos.y = GridManager.GetMaxHeight() * GridManager.GetSegmentHeight();
-		transform.position = tempPos;
-		cursor.transform.position = new Vector3 (cursor.transform.position.x, Camera.main.transform.position.y - yVal, 0);
+		if (lerpVsSnap) {
+			aimPos = tempPos;
+			goToPos = true;
+		} else {
+			cursor.transform.position = new Vector3 (cursor.transform.position.x, Camera.main.transform.position.y - yVal, 0);
+		}
 	}
 	
 	//left bumper
@@ -74,10 +84,13 @@ public class CameraScript : MonoBehaviour {
 	{
 		float yVal = Camera.main.transform.position.y - cursor.transform.position.y;
 		Vector3 tempPos = transform.position;
-		tempPos.y = 0;
-		transform.position = tempPos;
-		cursor.transform.position = new Vector3 (cursor.transform.position.x, Camera.main.transform.position.y - yVal, 0);
-
+		tempPos.y = lowestPoint;
+		if (lerpVsSnap) {
+			aimPos = tempPos;
+			goToPos = true;
+		} else {
+			cursor.transform.position = new Vector3 (cursor.transform.position.x, Camera.main.transform.position.y - yVal, 0);
+		}
 	}
 	
 }
