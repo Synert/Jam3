@@ -1,0 +1,21 @@
+fileFormatVersion: 2
+guid: 5fc09a1b13fb2964fb48d7974f6f2daf
+timeCreated: 1511867810
+licenseType: Free
+TrueTypeFontImporter:
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontName: Midnight Junk Yard
+  fontNames:
+  - Midnight Junk Yard
+  fallbackFontReferences: []
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
