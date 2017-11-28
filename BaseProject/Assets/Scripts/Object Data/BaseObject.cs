@@ -10,12 +10,27 @@ public class BaseObject : MonoBehaviour {
 	public GridBuilding building;
 	public bool show = false;
     public bool isFriendly = true;
+    public float buildTime = 1.0f;
+    public bool build = true;
 
 	void Start() {
 		building = GameObject.FindObjectOfType<GridBuilding> ();
 	}
 
-	public void takeDamage(int damage) {
+    void Update()
+    {
+        if(build)
+        {
+            buildTime -= Time.deltaTime;
+            if(buildTime <= 0.0f)
+            {
+                build = false;
+                //building.setPositionSolid(index);
+            }
+        }
+    }
+
+    public void takeDamage(int damage) {
 		hp -= damage;
 		testHealth ();
 	}

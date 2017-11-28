@@ -80,8 +80,12 @@ public class TurretAI : MonoBehaviour
 				lr.enabled = true;
 				currentShotDisplay = shotDisplay;
 				lr.positionCount = 2;
-				lr.SetPosition (0, transform.position);
-				lr.SetPosition (1, target.transform.position);
+                Vector3 temp = transform.position;
+                temp.z = 0;
+                Vector3 temp2 = target.transform.position;
+                temp2.z = 0;
+				lr.SetPosition (0, temp);
+				lr.SetPosition (1, temp2);
 			}
 			if (target) {
 				target.GetComponent<enemyBehaviour> ().takeDamage (1);

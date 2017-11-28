@@ -14,10 +14,11 @@ public class Recycle : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		string temp = "Money: " + Money;
-		temp += ":: Height ";
-		temp += GameObject.FindObjectOfType<GridBuilding> ().maxHeight;
-		GameObject.FindObjectOfType<Text> ().text = temp;
+		string temp = Money + " scrap";
+		string height = "Height: ";
+        GameObject.FindGameObjectWithTag("Money").GetComponent<Text>().text = temp;
+		height += GameObject.FindObjectOfType<GridBuilding> ().maxHeight;
+        GameObject.FindGameObjectWithTag("Height").GetComponent<Text>().text = height;
 	}
 
 	private void OnTriggerStay2D(Collider2D col)
