@@ -57,7 +57,6 @@ public class TurretAI : MonoBehaviour
 							Attack (false);
 						} else {
 							Attack (true);
-                            audios.GetComponent<AudioStuff>().playSound(3, 1.5f, 0.05f);
 						}
 					}
 				} else {
@@ -78,7 +77,8 @@ public class TurretAI : MonoBehaviour
         bulletTimer += Time.deltaTime;
 
         if (bulletTimer >= shootInterval)
-        {
+		{
+			audios.GetComponent<AudioStuff>().playSound(3, 1.5f, 0.05f);
 			if (sr.enabled) {
 				lr.enabled = true;
 				currentShotDisplay = shotDisplay;

@@ -22,11 +22,11 @@ public class GridBuilding : MonoBehaviour {
 	public int state = 0;
     public GameObject audios;
 
-	// Use this for initialization
-	void Start()
-	{
+    // Use this for initialization
+    void Start()
+    {
         audios = GameObject.Find("AudioObject");
-		cursor = GameObject.FindObjectOfType<MoveCursor>().gameObject;
+        cursor = GameObject.FindObjectOfType<MoveCursor>().gameObject;
 		gameover = GetComponent<Gameover>();
 		for (int a = 0; a < gridSections.x; a++)
 		{
@@ -95,18 +95,15 @@ public class GridBuilding : MonoBehaviour {
 					if (currentObj == 0)
 					{
 						BuildBlock();
-                     
-                    }
+					}
 					if (currentObj == 1)
 					{
 						BuildArmour ();
-                      
-                    }
+					}
 					if (currentObj == 2) 
 					{
 						BuildTurret();
-                       
-                    }
+					}
 				}
 			}
 			if (currentObj == 3)
@@ -116,7 +113,6 @@ public class GridBuilding : MonoBehaviour {
 					if (grid[temp].full == true)
 					{
 						DestroyBlock();
-						GameObject.FindObjectOfType<Recycle>().Money += Mathf.CeilToInt(grid[temp].obj.GetComponent<BaseObject>().cost/2);
 					}
 				}
 			}
@@ -168,32 +164,47 @@ public class GridBuilding : MonoBehaviour {
 				bool doesntHaveGroundAnySide = false;
 				checkSidesData data = checkSides (temp);
 				if (data.left) {
-					grid [temp].check = false;
-					if (!findGround (grid [data.leftIndex])) {
-						doesntHaveGroundAnySide = true;
+					if (grid [data.leftIndex].full) {
+						grid [temp].check = false;
+						if (!findGround (grid [data.leftIndex])) {
+							doesntHaveGroundAnySide = true;
+						}
 					}
 				}
 				if (data.right) {
-					grid [temp].check = false;
-					if (!findGround (grid [data.rightIndex])) {
-						doesntHaveGroundAnySide = true;
+					if (grid [data.rightIndex].full) {
+						grid [temp].check = false;
+						if (!findGround (grid [data.rightIndex])) {
+							doesntHaveGroundAnySide = true;
+						}
 					}
 				}
 				if (data.down) {
-					grid [temp].check = false;
-					if (!findGround (grid [data.downIndex])) {
-						doesntHaveGroundAnySide = true;
+					if (grid [data.downIndex].full) {
+						grid [temp].check = false;
+						if (!findGround (grid [data.downIndex])) {
+							doesntHaveGroundAnySide = true;
+						}
 					}
 				}
 				if (data.up) {
-					grid [temp].check = false;
-					if (!findGround (grid [data.upIndex])) {
-						doesntHaveGroundAnySide = true;
+					if (grid [data.upIndex].full) {
+						grid [temp].check = false;
+						if (!findGround (grid [data.upIndex])) {
+							doesntHaveGroundAnySide = true;
+						}
 					}
 				}
 
 				if (!doesntHaveGroundAnySide) {
-					destroyObjsAbove (temp);
+					Debug.Log (Mathf.FloorToInt((grid[temp].obj.GetComponent<BaseObject>().cost + 1)/2));
+					int scrapToGen = Mathf.FloorToInt((grid[temp].obj.GetComponent<BaseObject>().cost + 1)/2);
+					for (int a = 0; a < scrapToGen; a++) {
+						GameObject.Instantiate (scrapPrefab, cursor.transform.position, transform.rotation);
+					}
+					if (destroyObj (temp) == 1) {
+						findMaxHeight ();
+					}
 					GameObject.FindObjectOfType<checkWithinCamera> ().testSections ();
 				}
 			}
@@ -212,11 +223,10 @@ public class GridBuilding : MonoBehaviour {
 				if (grid[temp].full == false)
 				{
 					createObj(temp, obj[0], true, true, true, 0, true);
-                    
-                    GameObject.FindObjectOfType<checkWithinCamera>().testSections();
-                    audios.GetComponent<AudioStuff>().playSound(1, 0.8f, 0.04f);
-                }
-            }
+					audios.GetComponent<AudioStuff>().playSound(1);
+					GameObject.FindObjectOfType<checkWithinCamera>().testSections();
+				}
+			}
 		}
 		if (Input.GetMouseButton(1))
 		{
@@ -244,6 +254,7 @@ public class GridBuilding : MonoBehaviour {
 				if (grid[temp].full == false)
 				{
 					createObj(temp, obj[1], false, false, false, 1, true);
+					audios.GetComponent<AudioStuff>().playSound(1);
 					GameObject.FindObjectOfType<checkWithinCamera>().testSections();
 				}
 			}
@@ -254,13 +265,20 @@ public class GridBuilding : MonoBehaviour {
 	}
 
 	void overlayScrap() {
-		int temp = test(cursor.transform.position);
+		int temp = test (cursor.transform.position);
 		if (temp != -1) {
 			if ((grid [temp].full && currentObj == 3) ||
-				(grid [temp].full != true && currentObj != 3)) {
+			    (grid [temp].full != true && currentObj != 3)) {
+
+
+				Vector3 rot = transform.rotation.eulerAngles;
+				int rotation = currentRotation;
+				rot.z = rotation * 90;
+				overlay.transform.rotation = Quaternion.Euler (rot);
+				overlay.transform.position = new Vector3 (grid [temp].xy.x, grid [temp].xy.y, 0);
 
 				if (currentObj == 3) {
-					overlay.GetComponent<SpriteRenderer> ().sprite = scrapPrefab.GetComponent<SpriteRenderer> ().sprite;
+					overlay.GetComponent<SpriteRenderer> ().sprite = scrapPrefab.GetComponentInChildren<SpriteRenderer> ().sprite;
 					overlay.SetActive (true);
 				} else {
 					overlay.GetComponent<SpriteRenderer> ().sprite = obj [currentObj].GetComponent<SpriteRenderer> ().sprite;
@@ -280,41 +298,34 @@ public class GridBuilding : MonoBehaviour {
 							overlay.GetComponent<SpriteRenderer> ().color = Color.red;
 						}
 					}
-				}
 
-				Vector3 rot = transform.rotation.eulerAngles;
-				int rotation = currentRotation;
-				rot.z = rotation * 90;
-				overlay.transform.rotation = Quaternion.Euler (rot);
-				overlay.transform.position = new Vector3(grid[temp].xy.x, grid[temp].xy.y, 0);
-
-				if (obj[currentObj].GetComponent<ObjectSpawningOffsets>())
-				{
-					//canBuildApon
-					Vector3 offset = obj[currentObj].GetComponent<ObjectSpawningOffsets>().offset;
-					float offsetTemp = 0;
-					switch (currentRotation) {
-					case 1:
-						offsetTemp = offset.y;
-						offset.y = -offset.x;
-						offset.x = -offsetTemp;
-						break;
-					case 2:
-						offset.y *= -1;
-						break;
-					case 3:
-						offsetTemp = offset.y;
-						offset.y = offset.x;
-						offset.x = offsetTemp;
-						break;
+					if (obj [currentObj].GetComponent<ObjectSpawningOffsets> ()) {
+						//canBuildApon
+						Vector3 offset = obj [currentObj].GetComponent<ObjectSpawningOffsets> ().offset;
+						float offsetTemp = 0;
+						switch (currentRotation) {
+						case 1:
+							offsetTemp = offset.y;
+							offset.y = -offset.x;
+							offset.x = -offsetTemp;
+							break;
+						case 2:
+							offset.y *= -1;
+							break;
+						case 3:
+							offsetTemp = offset.y;
+							offset.y = offset.x;
+							offset.x = offsetTemp;
+							break;
+						}
+						overlay.transform.position += offset;
 					}
-					overlay.transform.position += offset;
 				}
 			} else {
 				overlay.SetActive (false);
 			}
 		} else {
-			overlay.SetActive (true);
+			overlay.SetActive (false);
 		}
 	}
 
@@ -555,7 +566,9 @@ public class GridBuilding : MonoBehaviour {
 				grid[_index].obj.transform.position += offset;
 			}
 
-			GameObject.FindObjectOfType<Recycle>().Money -= obj[currentObj].GetComponent<BaseObject>().cost;
+			if (grid[_index].obj.GetComponent<BaseObject>()) {
+				GameObject.FindObjectOfType<Recycle>().Money -= grid[_index].obj.GetComponent<BaseObject>().cost;
+			}
 		}
 	}
 

@@ -10,6 +10,7 @@ public class CameraScript : MonoBehaviour {
 	public GameObject cursor;
 	public bool goToPos = false;
 	public Vector3 aimPos;
+	public float minDist = 0;
 	public bool lerpVsSnap;
     
 	// Use this for initialization
@@ -26,8 +27,8 @@ public class CameraScript : MonoBehaviour {
 				if (Vector2.Distance (transform.position, aimPos) < 1) {
 					goToPos = false;
 				} else {
-					transform.position = Vector3.Lerp (transform.position, aimPos, Time.deltaTime);
 					float yVal = Camera.main.transform.position.y - cursor.transform.position.y;
+					transform.position = Vector3.Lerp (transform.position, aimPos, Time.deltaTime * 2);
 					cursor.transform.position = new Vector3 (cursor.transform.position.x, Camera.main.transform.position.y - yVal, 0);
 				}
 			}
@@ -68,28 +69,34 @@ public class CameraScript : MonoBehaviour {
 	//right bumper
 	void SnapTop()
 	{
-		float yVal = Camera.main.transform.position.y - cursor.transform.position.y;
-		Vector3 tempPos = transform.position;
-		tempPos.y = GridManager.GetMaxHeight() * GridManager.GetSegmentHeight();
-		if (lerpVsSnap) {
-			aimPos = tempPos;
-			goToPos = true;
-		} else {
-			cursor.transform.position = new Vector3 (cursor.transform.position.x, Camera.main.transform.position.y - yVal, 0);
+		if (GridManager.GetMaxHeight () * GridManager.GetSegmentHeight () - transform.position.y > minDist) {
+			float yVal = Camera.main.transform.position.y - cursor.transform.position.y;
+			Vector3 tempPos = transform.position;
+			tempPos.y = GridManager.GetMaxHeight () * GridManager.GetSegmentHeight ();
+			if (lerpVsSnap) {
+				aimPos = tempPos;
+				goToPos = true;
+			} else {
+				transform.position = tempPos;
+				cursor.transform.position = new Vector3 (cursor.transform.position.x, Camera.main.transform.position.y - yVal, 0);
+			}
 		}
 	}
 	
 	//left bumper
 	void SnapBottom()
 	{
-		float yVal = Camera.main.transform.position.y - cursor.transform.position.y;
-		Vector3 tempPos = transform.position;
-		tempPos.y = lowestPoint;
-		if (lerpVsSnap) {
-			aimPos = tempPos;
-			goToPos = true;
-		} else {
-			cursor.transform.position = new Vector3 (cursor.transform.position.x, Camera.main.transform.position.y - yVal, 0);
+		if (transform.position.y > minDist) {
+			float yVal = Camera.main.transform.position.y - cursor.transform.position.y;
+			Vector3 tempPos = transform.position;
+			tempPos.y = lowestPoint;
+			if (lerpVsSnap) {
+				aimPos = tempPos;
+				goToPos = true;
+			} else {
+				transform.position = tempPos;
+				cursor.transform.position = new Vector3 (cursor.transform.position.x, Camera.main.transform.position.y - yVal, 0);
+			}
 		}
 	}
 	

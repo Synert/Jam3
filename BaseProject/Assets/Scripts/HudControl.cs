@@ -34,4 +34,17 @@ public class HudControl : MonoBehaviour {
         //If button is pressed, toggle visual on corrosponding HUD button
         //If scrap collides with HUD recycler, increase value of the scrap count
 	}
+
+	void enableDisablePause() {
+		if(pauseMenu.gameObject.activeInHierarchy == false)
+		{
+			pauseMenu.gameObject.SetActive(true);
+			Time.timeScale = 0;
+		}
+		else
+		{
+			pauseMenu.gameObject.SetActive(false);
+			Time.timeScale = 1;
+		}
+	}
 }

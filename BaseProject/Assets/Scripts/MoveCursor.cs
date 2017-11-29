@@ -10,25 +10,27 @@ public class MoveCursor : MonoBehaviour {
 
     void takeInputs(variableData data)
     {
-		GridBuilding builder = GameObject.FindObjectOfType<GridBuilding>();
-		Vector3 transOffset = transform.position + (new Vector3(data.state.ThumbStickLeft.inputs.x, data.state.ThumbStickLeft.inputs.y, 0) / 5);
-		if (transOffset.x < builder.startPos.x - maxDistSide) {
-			transOffset.x = builder.startPos.x - maxDistSide;
-		}
+		if (Time.timeScale == 1) {
+			GridBuilding builder = GameObject.FindObjectOfType<GridBuilding> ();
+			Vector3 transOffset = transform.position + (new Vector3 (data.state.ThumbStickLeft.inputs.x, data.state.ThumbStickLeft.inputs.y, 0) / 5);
+			if (transOffset.x < builder.startPos.x - maxDistSide) {
+				transOffset.x = builder.startPos.x - maxDistSide;
+			}
 
-		if (transOffset.x > builder.startPos.x + (builder.gridSections.x - 1) * builder.size.x + maxDistSide) {
-			transOffset.x = builder.startPos.x + (builder.gridSections.x - 1) * builder.size.x + maxDistSide;
-		}
+			if (transOffset.x > builder.startPos.x + (builder.gridSections.x - 1) * builder.size.x + maxDistSide) {
+				transOffset.x = builder.startPos.x + (builder.gridSections.x - 1) * builder.size.x + maxDistSide;
+			}
 
-		if (transOffset.y < builder.startPos.y - maxYDown) {
-			transOffset.y = builder.startPos.y - maxYDown;
-		}
+			if (transOffset.y < builder.startPos.y - maxYDown) {
+				transOffset.y = builder.startPos.y - maxYDown;
+			}
 
-		if (transOffset.y > builder.startPos.y + (builder.gridSections.y - 1) * builder.size.y) {
-			transOffset.y = builder.startPos.y + (builder.gridSections.y - 1) * builder.size.y;
-		}
+			if (transOffset.y > builder.startPos.y + (builder.gridSections.y - 1) * builder.size.y) {
+				transOffset.y = builder.startPos.y + (builder.gridSections.y - 1) * builder.size.y;
+			}
 
-		transform.position = transOffset;
+			transform.position = transOffset;
+		}
     }
 
 	void selectScrap() {

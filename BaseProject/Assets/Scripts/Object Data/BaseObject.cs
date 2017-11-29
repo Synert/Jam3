@@ -62,7 +62,6 @@ public class BaseObject : MonoBehaviour {
             else
             {
                 float percentage = buildTime / initBuild;
-                Debug.Log(percentage);
                 m_line.SetPosition(1, new Vector3(bottom.x, bottom.y + percentage * 3.0f, -5.0f));
                 Color newCol = new Color(percentage, 1.0f - percentage, 0.0f, 0.7f);
                 m_line.SetColors(newCol, newCol);
@@ -87,6 +86,7 @@ public class BaseObject : MonoBehaviour {
 		if (name != "Turret") {
 			if (col.tag == "Bullet") {
 				if (col.GetComponent<BulletDestroy> ().isFriendly != isFriendly) {
+					audios.GetComponent<AudioStuff>().playSound(4);
 					takeDamage (1);
 					Destroy (col.gameObject);
 				}

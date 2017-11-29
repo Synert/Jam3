@@ -10,27 +10,25 @@ public class MainMenu : MonoBehaviour
     public bool isMainMenu;
     public bool isQuit;
 
+
     public bool isPressed;
 
     public Color selectedColour;
 
     public void ChangeScene()
-    {
-            if (isStart)
-            {
-                SceneManager.LoadScene("GameScene");
-            }
-            if (isHighscore)
-            {
-                SceneManager.LoadScene("Highscore");
-            }
-            if (isMainMenu)
-            {
-                SceneManager.LoadScene("Main Menu");
-            }
-            if (isQuit)
-            {
-             Application.Quit();
-            }
-    }
+	{
+		Time.timeScale = 1;
+		if (isStart) {
+			SceneManager.LoadScene ("GameScene");
+		}
+		if (isHighscore) {
+			SceneManager.LoadScene ("Highscore");
+		}
+		if (isMainMenu) {
+			SceneManager.LoadScene ("Main Menu");
+		}
+		if (isQuit) {
+			Application.Quit ();
+		}
+	}
 }

@@ -180,7 +180,7 @@ public class enemyBehaviour : MonoBehaviour
         Debug.Log("Bang");
         var bullet = (GameObject)Instantiate(bulletPrefab, myGun.position, myGun.rotation);
         bullet.GetComponent<Rigidbody2D>().velocity = new Vector2(5.0f * m_direction, 0);
-        audios.GetComponent<AudioStuff>().playSound(2,1,0.04f);
+        audios.GetComponent<AudioStuff>().playSound(3,1,0.04f);
         Destroy(bullet, 2.0f);
     }
 
