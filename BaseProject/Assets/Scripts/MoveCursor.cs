@@ -5,14 +5,17 @@ using UnityEngine;
 public class MoveCursor : MonoBehaviour {
 
 	public List<Scrap> scrap = new List<Scrap>();
+	public CameraScript cam;
+	public GridBuilding grid;
 	public float maxDistSide = 0;
 	public float maxYDown = 0;
+	public float speed = 5;
 
     void takeInputs(variableData data)
     {
 		if (Time.timeScale == 1) {
 			GridBuilding builder = GameObject.FindObjectOfType<GridBuilding> ();
-			Vector3 transOffset = transform.position + (new Vector3 (data.state.ThumbStickLeft.inputs.x, data.state.ThumbStickLeft.inputs.y, 0) / 3.5f);
+			Vector3 transOffset = transform.position + (new Vector3 (data.state.ThumbStickLeft.inputs.x, data.state.ThumbStickLeft.inputs.y, 0) * speed);
 			if (transOffset.x < builder.startPos.x - maxDistSide) {
 				transOffset.x = builder.startPos.x - maxDistSide;
 			}
@@ -21,8 +24,12 @@ public class MoveCursor : MonoBehaviour {
 				transOffset.x = builder.startPos.x + (builder.gridSections.x - 1) * builder.size.x + maxDistSide;
 			}
 
-			if (transOffset.y < builder.startPos.y - maxYDown) {
-				transOffset.y = builder.startPos.y - maxYDown;
+			if (transOffset.y > cam.transform.position.y - cam.maxCursorVal.y + 1) {
+				transOffset.y = cam.transform.position.y - cam.maxCursorVal.y + 1;
+			}
+
+			if (transOffset.y < -maxYDown) {
+				transOffset.y = -maxYDown;
 			}
 
 			if (transOffset.y > builder.startPos.y + (builder.gridSections.y - 1) * builder.size.y) {

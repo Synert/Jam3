@@ -10,6 +10,8 @@ public class CameraScript : MonoBehaviour {
 	public GameObject cursor;
 	public bool goToPos = false;
 	public Vector3 aimPos;
+	public float currentAimDist = 0;
+	public Vector2 maxCursorVal;
 	public float minDist = 0;
 	public bool lerpVsSnap;
     
@@ -24,19 +26,27 @@ public class CameraScript : MonoBehaviour {
 		//map controls in multi-input
 		if (lerpVsSnap) {
 			if (goToPos) {
-				if (Vector2.Distance (transform.position, aimPos) < 1) {
+				float yVal = Camera.main.transform.position.y - cursor.transform.position.y;
+				if (Vector2.Distance (transform.position, aimPos) < (currentAimDist / 10)) {
 					goToPos = false;
+					transform.position = aimPos;
 				} else {
-					float yVal = Camera.main.transform.position.y - cursor.transform.position.y;
 					transform.position = Vector3.Lerp (transform.position, aimPos, Time.deltaTime * 2);
-					cursor.transform.position = new Vector3 (cursor.transform.position.x, Camera.main.transform.position.y - yVal, 0);
 				}
+				cursor.transform.position = new Vector3 (cursor.transform.position.x, Camera.main.transform.position.y - yVal, 0);
 			}
 		}
 
 		speed = GridManager.GetMaxHeight () + 5;
-		
-		transform.position = checkPos(transform.position);
+
+		Vector3 tempPos = transform.position;
+		if (transform.position.y - cursor.transform.position.y > maxCursorVal.x) {
+			tempPos.y -= (transform.position.y - cursor.transform.position.y) - maxCursorVal.x;
+		} else if (transform.position.y - cursor.transform.position.y < maxCursorVal.y) {
+			tempPos.y -= (transform.position.y - cursor.transform.position.y) - maxCursorVal.y;
+		}
+			
+		transform.position = checkPos(tempPos);
 
     }
 
@@ -65,12 +75,10 @@ public class CameraScript : MonoBehaviour {
 		if(tempPos.y < lowestPoint)
 		{
 			tempPos.y = lowestPoint;
-			yVal = 0;
 		}
 		if(tempPos.y > GridManager.GetMaxHeight() * GridManager.GetSegmentHeight())
 		{
 			tempPos.y = GridManager.GetMaxHeight() * GridManager.GetSegmentHeight();
-			yVal = 0;
 		}
 
 		transform.position = tempPos;
@@ -86,6 +94,7 @@ public class CameraScript : MonoBehaviour {
 			Vector3 tempPos = transform.position;
 			tempPos.y = GridManager.GetMaxHeight () * GridManager.GetSegmentHeight ();
 			if (lerpVsSnap) {
+				currentAimDist = Vector3.Distance (transform.position, tempPos);
 				aimPos = tempPos;
 				goToPos = true;
 			} else {
@@ -103,6 +112,7 @@ public class CameraScript : MonoBehaviour {
 			Vector3 tempPos = transform.position;
 			tempPos.y = lowestPoint;
 			if (lerpVsSnap) {
+				currentAimDist = Vector3.Distance (transform.position, tempPos);
 				aimPos = tempPos;
 				goToPos = true;
 			} else {
