@@ -47,8 +47,10 @@ public class MoveCursor : MonoBehaviour {
 	void deselectScrap() {
 		GetComponent<CircleCollider2D> ().enabled = false;
 		for (int a = 0; a < scrap.Count; a++) {
-			scrap [a].currentlySelected = false;
-			scrap [a].resetRigidbody ();
+			if (scrap [a] != null) {
+				scrap [a].currentlySelected = false;
+				scrap [a].resetRigidbody ();
+			}
 		}
 		scrap.Clear ();
 	}

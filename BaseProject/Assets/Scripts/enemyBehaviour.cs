@@ -22,7 +22,7 @@ public class enemyBehaviour : MonoBehaviour
 
     bool isAlive = true;
     bool targetAcquired = false;
-    float speed = 2.0f;
+    public float speed = 4.5f;
     float step = 0.0f;
 
     float bulletSpeed = 5.0f;

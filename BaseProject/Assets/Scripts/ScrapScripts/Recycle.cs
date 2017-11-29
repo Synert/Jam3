@@ -7,6 +7,7 @@ public class Recycle : MonoBehaviour {
 
     GameObject m_stuff;
     public int Money = 0;
+	public int add = 1;
 	// Use this for initialization
 	void Start () {
 		
@@ -30,7 +31,7 @@ public class Recycle : MonoBehaviour {
             if(select.selected == true)
             {
                 Destroy(col.gameObject);
-                Money++;
+                Money+=add;
             }
             
         }

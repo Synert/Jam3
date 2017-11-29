@@ -54,6 +54,9 @@ public class BaseObject : MonoBehaviour {
             if(buildTime <= 0.0f)
             {
                 build = false;
+				if (name == "Turret") {
+					GetComponent<TurretAI> ().enabled = true;
+				}
 				building.grid[index].canBuildApon = true;
                 m_line.enabled = false;
                 m_line.SetWidth(0.25f, 0.25f);
