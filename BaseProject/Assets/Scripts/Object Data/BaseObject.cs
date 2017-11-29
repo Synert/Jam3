@@ -17,10 +17,12 @@ public class BaseObject : MonoBehaviour {
     public LineRenderer m_line;
     Vector3 bottom;
     float initBuild;
+    public GameObject audios;
 
     bool doOnce = false;
 
 	void Start() {
+        audios = GameObject.Find("AudioObject");
 		building = GameObject.FindObjectOfType<GridBuilding> ();
 
         //m_line = gameObject.AddComponent<LineRenderer>();
@@ -75,6 +77,7 @@ public class BaseObject : MonoBehaviour {
 
 	void testHealth() {
 		if (hp <= 0) {
+            audios.GetComponent<AudioStuff>().playSound(4);
 			building.resetPosition (index);
 		}
 	}

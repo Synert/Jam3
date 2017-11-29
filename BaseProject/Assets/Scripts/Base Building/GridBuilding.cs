@@ -144,7 +144,7 @@ public class GridBuilding : MonoBehaviour {
 	{
 		BuildFakeBlock(obj[0], true, true, true, 0);
         audios.GetComponent<AudioStuff>().playSound(1);
-	}
+    }
 
 	void BuildArmour()
 	{
@@ -212,10 +212,11 @@ public class GridBuilding : MonoBehaviour {
 				if (grid[temp].full == false)
 				{
 					createObj(temp, obj[0], true, true, true, 0, true);
-                    audios.GetComponent<AudioStuff>().playSound(1,0.8f,0.04f);
+                    
                     GameObject.FindObjectOfType<checkWithinCamera>().testSections();
-				}
-			}
+                    audios.GetComponent<AudioStuff>().playSound(1, 0.8f, 0.04f);
+                }
+            }
 		}
 		if (Input.GetMouseButton(1))
 		{

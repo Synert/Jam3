@@ -35,7 +35,7 @@ public class enemyBehaviour : MonoBehaviour
 
     public int maxHealth;
     bool isFriendly = false;
-
+    public GameObject audios;
 	/*
     void OnTriggerEnter2D(Collider2D col)
     {
@@ -54,6 +54,7 @@ public class enemyBehaviour : MonoBehaviour
     // Use this for initialization
     void Start ()
     {
+        audios = GameObject.Find("AudioObject");
         health = maxHealth;
         foreach (Transform child in transform)
         {
@@ -179,6 +180,7 @@ public class enemyBehaviour : MonoBehaviour
         Debug.Log("Bang");
         var bullet = (GameObject)Instantiate(bulletPrefab, myGun.position, myGun.rotation);
         bullet.GetComponent<Rigidbody2D>().velocity = new Vector2(5.0f * m_direction, 0);
+        audios.GetComponent<AudioStuff>().playSound(2,1,0.04f);
         Destroy(bullet, 2.0f);
     }
 
