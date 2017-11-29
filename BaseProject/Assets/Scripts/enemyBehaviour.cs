@@ -80,14 +80,14 @@ public class enemyBehaviour : MonoBehaviour
         {
             if(m_direction == -1)
             {
-                if(transform.position.x > 20.0f)
+                if(transform.position.x < -20.0f)
                 {
                     Death();
                 }
             }
             else
             {
-                if (transform.position.x < -20.0f)
+                if (transform.position.x > 20.0f)
                 {
                     Death();
                 }
