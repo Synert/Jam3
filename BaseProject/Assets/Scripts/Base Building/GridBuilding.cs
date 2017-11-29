@@ -20,10 +20,12 @@ public class GridBuilding : MonoBehaviour {
 	public GameObject scrapPrefab;
 	public Gameover gameover;
 	public int state = 0;
+    public GameObject audios;
 
 	// Use this for initialization
 	void Start()
 	{
+        audios = GameObject.Find("AudioObject");
 		cursor = GameObject.FindObjectOfType<MoveCursor>().gameObject;
 		gameover = GetComponent<Gameover>();
 		for (int a = 0; a < gridSections.x; a++)
@@ -93,15 +95,18 @@ public class GridBuilding : MonoBehaviour {
 					if (currentObj == 0)
 					{
 						BuildBlock();
-					}
+                     
+                    }
 					if (currentObj == 1)
 					{
 						BuildArmour ();
-					}
+                      
+                    }
 					if (currentObj == 2) 
 					{
 						BuildTurret();
-					}
+                       
+                    }
 				}
 			}
 			if (currentObj == 3)
@@ -138,17 +143,20 @@ public class GridBuilding : MonoBehaviour {
 	void BuildBlock()
 	{
 		BuildFakeBlock(obj[0], true, true, true, 0);
+        audios.GetComponent<AudioStuff>().playSound(1);
 	}
 
 	void BuildArmour()
 	{
 		BuildFakeBlock(obj[1], true, true, true, 0);
-	}
+        audios.GetComponent<AudioStuff>().playSound(1);
+    }
 
 	void BuildTurret()
 	{
 		BuildFakeBlock(obj[2], false, false, false, 1);
-	}
+        audios.GetComponent<AudioStuff>().playSound(1);
+    }
 
 	void DestroyBlock()
 	{
@@ -204,7 +212,8 @@ public class GridBuilding : MonoBehaviour {
 				if (grid[temp].full == false)
 				{
 					createObj(temp, obj[0], true, true, true, 0, true);
-					GameObject.FindObjectOfType<checkWithinCamera>().testSections();
+                    audios.GetComponent<AudioStuff>().playSound(1,0.8f,0.04f);
+                    GameObject.FindObjectOfType<checkWithinCamera>().testSections();
 				}
 			}
 		}

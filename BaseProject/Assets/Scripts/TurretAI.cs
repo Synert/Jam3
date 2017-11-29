@@ -17,10 +17,12 @@ public class TurretAI : MonoBehaviour
 	SpriteRenderer sr;
 	public float shotDisplay = 0;
 	public float currentShotDisplay = 0;
+    public GameObject audios;
 
 	void Start() {
 		lr = GetComponent<LineRenderer> ();
 		sr = GetComponent<SpriteRenderer> ();
+        audios = GameObject.Find("AudioObject");
 	}
 
     void Update()
@@ -55,6 +57,7 @@ public class TurretAI : MonoBehaviour
 							Attack (false);
 						} else {
 							Attack (true);
+                            audios.GetComponent<AudioStuff>().playSound(3, 1.5f, 0.05f);
 						}
 					}
 				} else {
