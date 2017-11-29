@@ -36,6 +36,9 @@ public class enemyBehaviour : MonoBehaviour
     public int maxHealth;
     bool isFriendly = false;
     public GameObject audios;
+
+    bool doOnce = false;
+
 	/*
     void OnTriggerEnter2D(Collider2D col)
     {
@@ -68,6 +71,29 @@ public class enemyBehaviour : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        //destroy when offscreen
+        if(!doOnce)
+        {
+            doOnce = true;
+        }
+        else
+        {
+            if(m_direction == -1)
+            {
+                if(transform.position.x > 20.0f)
+                {
+                    Death();
+                }
+            }
+            else
+            {
+                if (transform.position.x < -20.0f)
+                {
+                    Death();
+                }
+            }
+        }
+
         if (isAlive)
         {
             transform.localScale = new Vector3(-m_direction, transform.localScale.y, transform.localScale.z);

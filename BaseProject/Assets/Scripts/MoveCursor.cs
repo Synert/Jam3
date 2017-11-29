@@ -12,7 +12,7 @@ public class MoveCursor : MonoBehaviour {
     {
 		if (Time.timeScale == 1) {
 			GridBuilding builder = GameObject.FindObjectOfType<GridBuilding> ();
-			Vector3 transOffset = transform.position + (new Vector3 (data.state.ThumbStickLeft.inputs.x, data.state.ThumbStickLeft.inputs.y, 0) / 5);
+			Vector3 transOffset = transform.position + (new Vector3 (data.state.ThumbStickLeft.inputs.x, data.state.ThumbStickLeft.inputs.y, 0) / 3.5f);
 			if (transOffset.x < builder.startPos.x - maxDistSide) {
 				transOffset.x = builder.startPos.x - maxDistSide;
 			}

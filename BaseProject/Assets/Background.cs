@@ -51,6 +51,16 @@ public class Background : MonoBehaviour {
             bg2.position = new Vector3(camera.position.x, (y + 1) * x + offset);
         }
 
+        //a kinda hacky fix for the 'floor cloud' problem
+        if(y == -1)
+        {
+            bg2.gameObject.SetActive(false);
+        }
+        else
+        {
+            bg2.gameObject.SetActive(true);
+        }
+
         float col = Mathf.Max(dist, 0) / 3.0f;
         float div = 1.0f + col;
 
