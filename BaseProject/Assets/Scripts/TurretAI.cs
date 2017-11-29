@@ -78,8 +78,11 @@ public class TurretAI : MonoBehaviour
 
         if (bulletTimer >= shootInterval)
 		{
-			audios.GetComponent<AudioStuff>().playSound(3, 1.5f, 0.05f);
-			if (sr.enabled) {
+            if (audios)
+            {
+                audios.GetComponent<AudioStuff>().playSound(3, 1.5f, 0.05f);
+            }
+            if (sr.enabled) {
 				lr.enabled = true;
 				currentShotDisplay = shotDisplay;
 				lr.positionCount = 2;

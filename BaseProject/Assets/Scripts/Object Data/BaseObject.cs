@@ -76,8 +76,11 @@ public class BaseObject : MonoBehaviour {
 
 	void testHealth() {
 		if (hp <= 0) {
-            audios.GetComponent<AudioStuff>().playSound(4);
-			building.resetPosition (index);
+            if (audios)
+            {
+                audios.GetComponent<AudioStuff>().playSound(4);
+            }
+            building.resetPosition (index);
 		}
 	}
 
@@ -86,8 +89,11 @@ public class BaseObject : MonoBehaviour {
 		if (name != "Turret") {
 			if (col.tag == "Bullet") {
 				if (col.GetComponent<BulletDestroy> ().isFriendly != isFriendly) {
-					audios.GetComponent<AudioStuff>().playSound(4);
-					takeDamage (1);
+                    if (audios)
+                    {
+                        audios.GetComponent<AudioStuff>().playSound(4);
+                    }
+                    takeDamage (1);
 					Destroy (col.gameObject);
 				}
 			}

@@ -36,27 +36,16 @@ public class enemyBehaviour : MonoBehaviour
     public int maxHealth;
     bool isFriendly = false;
     public GameObject audios;
+    public Vector3 originalScale;
+    public float raycastMagicNumber = 0;
+    public bool displayOnly = false;
 
     bool doOnce = false;
-
-	/*
-    void OnTriggerEnter2D(Collider2D col)
-    {
-        if (col.tag == "Bullet")
-        {
-            if (col.GetComponent<BulletDestroy>().isFriendly != isFriendly)
-            {
-                health -= 1;
-                Destroy(col.gameObject);
-                takeDamage();
-            }
-        }
-    }
-    */
 
     // Use this for initialization
     void Start ()
     {
+        originalScale = transform.localScale;
         audios = GameObject.Find("AudioObject");
         health = maxHealth;
         foreach (Transform child in transform)
@@ -96,7 +85,7 @@ public class enemyBehaviour : MonoBehaviour
 
         if (isAlive)
         {
-            transform.localScale = new Vector3(-m_direction, transform.localScale.y, transform.localScale.z);
+            transform.localScale = new Vector3(-m_direction * originalScale.x, transform.localScale.y, transform.localScale.z);
 
             if (targetAcquired == false)
             {
@@ -109,11 +98,11 @@ public class enemyBehaviour : MonoBehaviour
 
     void getTarget()
     {
-        Debug.DrawLine(myGun.transform.position, myGun.transform.position + (myGun.transform.up * 20.0f));
+        Debug.DrawLine(myGun.transform.position, myGun.transform.position + (myGun.transform.up * (20.0f - raycastMagicNumber)));
 
         if (targetAcquired == false)
         {
-            RaycastHit2D hit = Physics2D.Raycast(myGun.transform.position, myGun.transform.up, 20.0f, towerMask);
+            RaycastHit2D hit = Physics2D.Raycast(myGun.transform.position, myGun.transform.up, 20.0f - raycastMagicNumber, towerMask);
             if (hit == true)
             {
                 Debug.Log("targetAcquired");
@@ -206,7 +195,10 @@ public class enemyBehaviour : MonoBehaviour
         Debug.Log("Bang");
         var bullet = (GameObject)Instantiate(bulletPrefab, myGun.position, myGun.rotation);
         bullet.GetComponent<Rigidbody2D>().velocity = new Vector2(5.0f * m_direction, 0);
-        audios.GetComponent<AudioStuff>().playSound(3,1,0.04f);
+        if (audios)
+        {
+            audios.GetComponent<AudioStuff>().playSound(3, 1, 0.04f);
+        }
         Destroy(bullet, 2.0f);
     }
 
@@ -228,7 +220,10 @@ public class enemyBehaviour : MonoBehaviour
         if (health <= 0 && isAlive)
         {
             isAlive = false;
-			GetComponent<ScrapGenerator> ().CreateScrap ();
+            if (!displayOnly)
+            {
+                GetComponent<ScrapGenerator>().CreateScrap();
+            }
             Death();
         }
     }

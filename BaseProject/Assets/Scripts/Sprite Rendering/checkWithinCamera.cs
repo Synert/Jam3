@@ -31,7 +31,7 @@ public class checkWithinCamera : MonoBehaviour {
 			clearSections ();
 			for (int a = -renderSize; a < renderSize; a++) {
 				for (int b = -renderSize; b < renderSize; b++) {
-					int index = building.testRaw (pos + new Vector2 (a, b));
+					int index = building.testRaw (pos + new Vector2 (a * building.size.x, b * building.size.y));
 					if (index == -1) {
 						continue;
 					}

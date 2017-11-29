@@ -13,8 +13,9 @@ public class EnemyManager : MonoBehaviour {
 	public float breatherMax = 10.0f;
 	public int segSize = 10;
 	public int baseEnemies = 2;
+    public float iHateYourMagicNumbersSoHeresOneOfMine = 0;
 
-	int[] enemiesAlive;
+    int[] enemiesAlive;
 	int[] currentWave;
 	bool[] waveEnded;
 	float[] breatherTime;
@@ -106,9 +107,9 @@ public class EnemyManager : MonoBehaviour {
             newY = Mathf.Min(newY, maxHeight);
 
             newEnemy.transform.position = new Vector3(0.0f, newY) + origin;
-            newEnemy.transform.position = new Vector3((45.0f + i * 6) * direction, newEnemy.transform.position.y);
-				
-			enemiesAlive[seg]++;
+            newEnemy.transform.position = new Vector3(((45.0f + i * 6) - iHateYourMagicNumbersSoHeresOneOfMine) * direction, newEnemy.transform.position.y);
+
+            enemiesAlive[seg]++;
 		}
 	}
 

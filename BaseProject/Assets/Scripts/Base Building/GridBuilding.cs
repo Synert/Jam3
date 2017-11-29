@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.IO;
 using UnityEngine.UI;
 
 public class GridBuilding : MonoBehaviour {
@@ -22,52 +23,84 @@ public class GridBuilding : MonoBehaviour {
 	public Gameover gameover;
 	public int state = 0;
     public GameObject audios;
-
+	public float creationZ = 0;
+	public bool editOnly;
+	public bool displayOnly;
+	public bool loadInFromFile;
+	public TextAsset file;
     Image[] highlight;
 
     // Use this for initialization
     void Start()
     {
-        highlight = new Image[3];
-        highlight[0] = GameObject.FindGameObjectWithTag("NormalBG").GetComponent<Image>();
-        highlight[1] = GameObject.FindGameObjectWithTag("ArmorBG").GetComponent<Image>();
-        highlight[2] = GameObject.FindGameObjectWithTag("GunBG").GetComponent<Image>();
-
-        audios = GameObject.Find("AudioObject");
-        cursor = GameObject.FindObjectOfType<MoveCursor>().gameObject;
-		gameover = GetComponent<Gameover>();
-		for (int a = 0; a < gridSections.x; a++)
-		{
-			for (int b = 0; b < gridSections.y; b++)
-			{
-				grid.Add(new gridSection(new Vector4(startPos.x + (a * size.x), startPos.y + (b * size.y), startPos.x + ((a + 1) * size.x), startPos.y + ((b + 1) * size.y)), new Vector3((a * (int)gridSections.y) + b, a, b)));
+		if (loadInFromFile) {
+			string[] input = file.text.Split('\n');
+			gridSections.x = int.Parse(input [0]);
+			gridSections.y = int.Parse(input [1]);
+			size.x = (float)double.Parse(input [2]);
+			size.y = (float)double.Parse(input [3]);
+			startPos.x = (float)double.Parse(input [4]);
+			startPos.y = (float)double.Parse(input [5]);
+			for (int a = 0; a < gridSections.x; a++) {
+				for (int b = 0; b < gridSections.y; b++) {
+					grid.Add (new gridSection (new Vector4 (startPos.x + (a * size.x), startPos.y + (b * size.y), startPos.x + ((a + 1) * size.x), startPos.y + ((b + 1) * size.y)), new Vector3 ((a * (int)gridSections.y) + b, a, b)));
+				}
 			}
+			for(int a = 6; a < input.Length - 1; a+=3) {
+				gridSection sec = grid[int.Parse(input [a])];
+				int _obj = int.Parse(input [a + 1]);
+				currentRotation = int.Parse(input [a + 2]);
+				if (_obj == 0) {
+					createObj (sec.index, obj [_obj], true, true, true, 0, true, true);
+				}
+				if (_obj == 1) {
+					createObj(sec.index, obj[_obj], true, true, true, 0, true, true);
+				}
+				if (_obj == 2) {
+					createObj(sec.index, obj[_obj], false, false, false, 1, false, true);
+				}
+			}
+			GameObject.FindObjectOfType<checkWithinCamera>().testSections();
 		}
+		if (!displayOnly) {
+			if (!editOnly) {
+				audios = GameObject.Find ("AudioObject");
+				cursor = GameObject.FindObjectOfType<MoveCursor> ().gameObject;
+				gameover = GetComponent<Gameover> ();
+            }
+            highlight = new Image[3];
+            highlight[0] = GameObject.FindGameObjectWithTag("NormalBG").GetComponent<Image>();
+            highlight[1] = GameObject.FindGameObjectWithTag("ArmorBG").GetComponent<Image>();
+            highlight[2] = GameObject.FindGameObjectWithTag("GunBG").GetComponent<Image>();
+            for (int a = 0; a < gridSections.x; a++) {
+				for (int b = 0; b < gridSections.y; b++) {
+					grid.Add (new gridSection (new Vector4 (startPos.x + (a * size.x), startPos.y + (b * size.y), startPos.x + ((a + 1) * size.x), startPos.y + ((b + 1) * size.y)), new Vector3 ((a * (int)gridSections.y) + b, a, b)));
+				}
+			}
 
-		LineRenderer lr = GetComponent<LineRenderer>();
-		lr.enabled = enableLineRenderer;
-		lr.positionCount = (5 * (int)gridSections.y) + (5 * (int)gridSections.x);
+			LineRenderer lr = GetComponent<LineRenderer> ();
+			lr.enabled = enableLineRenderer;
+			lr.positionCount = (5 * (int)gridSections.y) + (5 * (int)gridSections.x);
 
-		int aCost = 0;
-		for (int a = 0; a < gridSections.y * 5; a += 5)
-		{
-			int aOffset = a / 5;
-			lr.SetPosition(a, new Vector3(startPos.x - (size.x / 2), startPos.y + (aOffset * size.y) - (size.y / 2), 0));
-			lr.SetPosition(a + 1, new Vector3(startPos.x + (size.x * gridSections.x) - (size.x / 2), startPos.y + (aOffset * size.y) - (size.y / 2), 0));
-			lr.SetPosition(a + 2, new Vector3(startPos.x + (size.x * gridSections.x) - (size.x / 2), startPos.y + (aOffset * size.y) + size.y - (size.y / 2), 0));
-			lr.SetPosition(a + 3, new Vector3(startPos.x - (size.x / 2), startPos.y + (aOffset * size.y) + size.y - (size.y / 2), 0));
-			lr.SetPosition(a + 4, new Vector3(startPos.x - (size.x / 2), startPos.y + (aOffset * size.y) - (size.y / 2), 0));
-			aCost += 5;
-		}
+			int aCost = 0;
+			for (int a = 0; a < gridSections.y * 5; a += 5) {
+				int aOffset = a / 5;
+				lr.SetPosition (a, new Vector3 (startPos.x - (size.x / 2), startPos.y + (aOffset * size.y) - (size.y / 2), 0));
+				lr.SetPosition (a + 1, new Vector3 (startPos.x + (size.x * gridSections.x) - (size.x / 2), startPos.y + (aOffset * size.y) - (size.y / 2), 0));
+				lr.SetPosition (a + 2, new Vector3 (startPos.x + (size.x * gridSections.x) - (size.x / 2), startPos.y + (aOffset * size.y) + size.y - (size.y / 2), 0));
+				lr.SetPosition (a + 3, new Vector3 (startPos.x - (size.x / 2), startPos.y + (aOffset * size.y) + size.y - (size.y / 2), 0));
+				lr.SetPosition (a + 4, new Vector3 (startPos.x - (size.x / 2), startPos.y + (aOffset * size.y) - (size.y / 2), 0));
+				aCost += 5;
+			}
 
-		for (int a = 0; a < gridSections.x * 5; a += 5)
-		{
-			int aOffset = a / 5;
-			lr.SetPosition(a + aCost, new Vector3(startPos.x + (aOffset * size.x) - (size.x / 2), startPos.y - (size.y / 2), 0));
-			lr.SetPosition(a + 1 + aCost, new Vector3(startPos.x + (aOffset * size.x) - (size.x / 2), startPos.y + (size.y * gridSections.y) - (size.y / 2), 0));
-			lr.SetPosition(a + 2 + aCost, new Vector3(startPos.x + (aOffset * size.x) + size.x - (size.x / 2), startPos.y + (size.y * gridSections.y) - (size.y / 2), 0));
-			lr.SetPosition(a + 3 + aCost, new Vector3(startPos.x + (aOffset * size.x) + size.x - (size.x / 2), startPos.y - (size.y / 2), 0));
-			lr.SetPosition(a + 4 + aCost, new Vector3(startPos.x + (aOffset * size.x) - (size.x / 2), startPos.y - (size.y / 2), 0));
+			for (int a = 0; a < gridSections.x * 5; a += 5) {
+				int aOffset = a / 5;
+				lr.SetPosition (a + aCost, new Vector3 (startPos.x + (aOffset * size.x) - (size.x / 2), startPos.y - (size.y / 2), 0));
+				lr.SetPosition (a + 1 + aCost, new Vector3 (startPos.x + (aOffset * size.x) - (size.x / 2), startPos.y + (size.y * gridSections.y) - (size.y / 2), 0));
+				lr.SetPosition (a + 2 + aCost, new Vector3 (startPos.x + (aOffset * size.x) + size.x - (size.x / 2), startPos.y + (size.y * gridSections.y) - (size.y / 2), 0));
+				lr.SetPosition (a + 3 + aCost, new Vector3 (startPos.x + (aOffset * size.x) + size.x - (size.x / 2), startPos.y - (size.y / 2), 0));
+				lr.SetPosition (a + 4 + aCost, new Vector3 (startPos.x + (aOffset * size.x) - (size.x / 2), startPos.y - (size.y / 2), 0));
+			}
 		}
 	}
 
@@ -87,7 +120,7 @@ public class GridBuilding : MonoBehaviour {
 
 	void controllerOptions()
 	{
-        int cost = 0;
+		int cost = 0;
 		if (currentObj < obj.Length) {
 			if (obj [currentObj].GetComponent<BaseObject> ()) {
 				cost = obj [currentObj].GetComponent<BaseObject> ().cost;
@@ -95,7 +128,7 @@ public class GridBuilding : MonoBehaviour {
 		}
 		if (GameObject.FindObjectOfType<Recycle> ().Money >= cost)
 		{
-			int temp = test(cursor.transform.position);
+			int temp = test (cursor.transform.position);
 			if (temp != -1)
 			{
 				if (grid[temp].full == false)
@@ -147,19 +180,25 @@ public class GridBuilding : MonoBehaviour {
 	void BuildBlock()
 	{
 		BuildFakeBlock(obj[0], true, true, true, 0);
-        audios.GetComponent<AudioStuff>().playSound(1);
+		if (audios) {
+			audios.GetComponent<AudioStuff> ().playSound (1);
+		}
     }
 
 	void BuildArmour()
 	{
 		BuildFakeBlock(obj[1], true, true, true, 0);
-        audios.GetComponent<AudioStuff>().playSound(1);
+		if (audios) {
+			audios.GetComponent<AudioStuff> ().playSound (1);
+		}
     }
 
 	void BuildTurret()
 	{
 		BuildFakeBlock(obj[2], false, false, false, 1);
-        audios.GetComponent<AudioStuff>().playSound(1);
+		if (audios) {
+			audios.GetComponent<AudioStuff> ().playSound (1);
+		}
     }
 
 	void DestroyBlock()
@@ -205,15 +244,17 @@ public class GridBuilding : MonoBehaviour {
 				}
 
 				if (!doesntHaveGroundAnySide) {
-					Debug.Log (Mathf.FloorToInt((grid[temp].obj.GetComponent<BaseObject>().cost + 1)/2));
-					int scrapToGen = Mathf.FloorToInt((grid[temp].obj.GetComponent<BaseObject>().cost + 1)/2);
-					for (int a = 0; a < scrapToGen; a++) {
-						GameObject.Instantiate (scrapPrefab, cursor.transform.position, transform.rotation);
+					if (!displayOnly) {
+						Debug.Log (Mathf.FloorToInt ((grid [temp].obj.GetComponent<BaseObject> ().cost + 1) / 2));
+						int scrapToGen = Mathf.FloorToInt ((grid [temp].obj.GetComponent<BaseObject> ().cost + 1) / 2);
+						for (int a = 0; a < scrapToGen; a++) {
+							GameObject.Instantiate (scrapPrefab, cursor.transform.position, transform.rotation);
+						}
+						if (destroyObj (temp) == 1) {
+							findMaxHeight ();
+						}
+						GameObject.FindObjectOfType<checkWithinCamera> ().testSections ();
 					}
-					if (destroyObj (temp) == 1) {
-						findMaxHeight ();
-					}
-					GameObject.FindObjectOfType<checkWithinCamera> ().testSections ();
 				}
 			}
 		}
@@ -221,17 +262,16 @@ public class GridBuilding : MonoBehaviour {
 
 	// Update is called once per frame
 	void Update()
-	{
-        for (int i = 0; i < 3; i++)
-        {
-            highlight[i].color = new Color(0.77254902f, 0.74901960784f, 0.74901960784f, 1.0f);
-        }
+    {
+		if (highlight != null) {
+			for (int i = 0; i < highlight.Length; i++) {
+				highlight [i].color = new Color (0.77254902f, 0.74901960784f, 0.74901960784f, 1.0f);
+			}
 
-        if(currentObj >= 0 && currentObj < 3)
-        {
-            highlight[currentObj].color = new Color(0.95f, 0.55f, 0.3f, 1.0f);
-        }
-
+			if (currentObj >= 0 && currentObj < 3 && currentObj < highlight.Length) {
+				highlight [currentObj].color = new Color (0.95f, 0.55f, 0.3f, 1.0f);
+			}
+		}
         GetComponent<LineRenderer>().enabled = enableLineRenderer;
 		if (Input.GetMouseButton(0))
 		{
@@ -240,8 +280,10 @@ public class GridBuilding : MonoBehaviour {
 			{
 				if (grid[temp].full == false)
 				{
-					createObj(temp, obj[0], true, true, true, 0, true);
-					audios.GetComponent<AudioStuff>().playSound(1);
+					createObj(temp, obj[currentObj], true, true, true, 0, true);
+					if (audios) {
+						audios.GetComponent<AudioStuff> ().playSound (1);
+					}
 					GameObject.FindObjectOfType<checkWithinCamera>().testSections();
 				}
 			}
@@ -272,14 +314,48 @@ public class GridBuilding : MonoBehaviour {
 				if (grid[temp].full == false)
 				{
 					createObj(temp, obj[1], false, false, false, 1, true);
-					audios.GetComponent<AudioStuff>().playSound(1);
+					if (audios) {
+						audios.GetComponent<AudioStuff> ().playSound (1);
+					}
 					GameObject.FindObjectOfType<checkWithinCamera>().testSections();
 				}
 			}
 
 		}
 
-		overlayScrap ();
+		if (!displayOnly) {
+			overlayScrap ();
+		}
+	
+	}
+
+	void saveGame() {
+		string path = "Assets/Text/" + file.name + ".txt";
+
+		StreamWriter write = new StreamWriter (path, false);
+
+		write.WriteLine (gridSections.x);
+		write.WriteLine (gridSections.y);
+		write.WriteLine (size.x);
+		write.WriteLine (size.y);
+		write.WriteLine (startPos.x);
+		write.WriteLine (startPos.y);
+		for (int a = 0; a < grid.Count; a++) {
+			write.WriteLine (grid [a].index);
+			if (grid [a].objNum == 0) {
+				write.WriteLine (grid [a].objNum);
+			} else if (grid [a].objNum == 1) {
+				write.WriteLine (grid [a].objNum);
+			} else if (grid [a].objNum == 2) {
+				write.WriteLine (grid [a].objNum);
+			} else {
+				write.WriteLine ("-1");
+			} 
+			write.WriteLine (grid [a].rotation);
+		}
+
+		write.Close ();
+		Debug.Log ("Saved");
 	}
 
 	void overlayScrap() {
@@ -381,8 +457,11 @@ public class GridBuilding : MonoBehaviour {
 					List<gridSection> above = gatherSpaces(new findOptionsOpenClosedIncludeSolid(true), grid[temp.leftIndex]);
 					if (above.Count >= maxDropBeforeDeath)
 					{
-						gameover.setScore(maxHeight);
-						Debug.Log("Death");
+						if (!displayOnly) {
+							if (!editOnly) {
+								gameover.setScore (maxHeight);
+							}
+						}
 					}
 					for (int a = 0; a < above.Count; a++)
 					{
@@ -402,8 +481,11 @@ public class GridBuilding : MonoBehaviour {
 					List<gridSection> above = gatherSpaces(new findOptionsOpenClosedIncludeSolid(true), grid[temp.rightIndex]);
 					if (above.Count >= maxDropBeforeDeath)
 					{
-						gameover.setScore(maxHeight);
-						Debug.Log("Death");
+						if (!displayOnly) {
+							if (!editOnly) {
+								gameover.setScore (maxHeight);
+							}
+						}
 					}
 					for (int a = 0; a < above.Count; a++)
 					{
@@ -423,8 +505,11 @@ public class GridBuilding : MonoBehaviour {
 					List<gridSection> above = gatherSpaces(new findOptionsOpenClosedIncludeSolid(true), grid[temp.upIndex]);
 					if (above.Count >= maxDropBeforeDeath)
 					{
-						gameover.setScore(maxHeight);
-						Debug.Log("Death");
+						if (!displayOnly) {
+							if (!editOnly) {
+								gameover.setScore (maxHeight);
+							}
+						}
 					}
 					for (int a = 0; a < above.Count; a++)
 					{
@@ -443,8 +528,11 @@ public class GridBuilding : MonoBehaviour {
 					List<gridSection> above = gatherSpaces(new findOptionsOpenClosedIncludeSolid(true), grid[temp.downIndex]);
 					if (above.Count >= maxDropBeforeDeath)
 					{
-						gameover.setScore(maxHeight);
-						Debug.Log("Death");
+						if (!displayOnly) {
+							if (!editOnly) {
+								gameover.setScore (maxHeight);
+							}
+						}
 					}
 					for (int a = 0; a < above.Count; a++)
 					{
@@ -551,12 +639,14 @@ public class GridBuilding : MonoBehaviour {
 			int rotation = currentRotation;
 			if (needsRotation == 0) {
 				rotation = Random.Range (0, 3);
-				Debug.Log (rotation);
 			}
 			rot.z = rotation * 90;
 			grid [_index].rotation = currentRotation;
-			grid[_index].obj = GameObject.Instantiate(_obj, new Vector3(grid[_index].xy.x, grid[_index].xy.y, 0), Quaternion.Euler(rot));
+			grid[_index].obj = GameObject.Instantiate(_obj, new Vector3(grid[_index].xy.x, grid[_index].xy.y, creationZ), Quaternion.Euler(rot));
 			grid[_index].obj.GetComponent<SpriteRenderer>().enabled = false;
+			grid [_index].obj.transform.localScale = new Vector3(grid [_index].obj.transform.lossyScale.x / (3 / size.x),
+														grid [_index].obj.transform.lossyScale.y / (3 / size.y), 1);
+			grid [_index].objNum = currentObj;
 			if (grid[_index].obj.GetComponent<BaseObject>())
 			{
 				grid[_index].obj.GetComponent<BaseObject>().index = _index;
@@ -581,10 +671,11 @@ public class GridBuilding : MonoBehaviour {
 					offset.x = offsetTemp;
 					break;
 				}
+				offset = new Vector3 (offset.x * size.x, offset.y * size.y, 1);
 				grid[_index].obj.transform.position += offset;
 			}
 
-			if (grid[_index].obj.GetComponent<BaseObject>()) {
+			if (grid[_index].obj.GetComponent<BaseObject>() && force != true) {
 				GameObject.FindObjectOfType<Recycle>().Money -= grid[_index].obj.GetComponent<BaseObject>().cost;
 			}
 		}
@@ -1192,6 +1283,7 @@ public class gridSection
 	public bool canBuildApon = false;
 	public int rotation = 0;
 	public GameObject obj = null;
+	public int objNum = -1;
 	public int index;
 	public Vector2I indexAB;
 	public bool check = true;
