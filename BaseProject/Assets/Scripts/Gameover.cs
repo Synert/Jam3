@@ -24,9 +24,7 @@ public class Gameover : MonoBehaviour
     }
 
 	void Update() {
-		if (PlayerPrefs.GetInt ("Highscore", highscore) != -1) {
-			highscoreText.text = "Highscore: " + highscore.ToString();
-		}
+		highscoreText.text = "Highscore: " + PlayerPrefs.GetInt("Highscore", 0).ToString();
 	}
 
     void loadScene()

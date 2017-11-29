@@ -201,6 +201,46 @@ public class GridBuilding : MonoBehaviour {
 		}
     }
 
+	bool testBlockDestroy(int temp) {
+		bool doesntHaveGroundAnySide = false;
+		checkSidesData data = checkSides (temp);
+		if (data.left) {
+			if (grid [data.leftIndex].full) {
+				grid [temp].check = false;
+				if (!findGround (grid [data.leftIndex])) {
+					doesntHaveGroundAnySide = true;
+				}
+			}
+		}
+		if (data.right) {
+			if (grid [data.rightIndex].full) {
+				grid [temp].check = false;
+				if (!findGround (grid [data.rightIndex])) {
+					doesntHaveGroundAnySide = true;
+				}
+			}
+		}
+		if (data.down) {
+			if (grid [data.downIndex].full) {
+				grid [temp].check = false;
+				if (!findGround (grid [data.downIndex])) {
+					doesntHaveGroundAnySide = true;
+				}
+			}
+		}
+		if (data.up) {
+			if (grid [data.upIndex].full) {
+				grid [temp].check = false;
+				if (!findGround (grid [data.upIndex])) {
+					doesntHaveGroundAnySide = true;
+				}
+			}
+		}
+
+		grid [temp].check = true;
+		return doesntHaveGroundAnySide;
+	}
+
 	void DestroyBlock()
 	{
 		int temp = test(cursor.transform.position);
@@ -208,49 +248,17 @@ public class GridBuilding : MonoBehaviour {
 		{
 			if (grid[temp].full == true)
 			{
-				bool doesntHaveGroundAnySide = false;
-				checkSidesData data = checkSides (temp);
-				if (data.left) {
-					if (grid [data.leftIndex].full) {
-						grid [temp].check = false;
-						if (!findGround (grid [data.leftIndex])) {
-							doesntHaveGroundAnySide = true;
-						}
-					}
-				}
-				if (data.right) {
-					if (grid [data.rightIndex].full) {
-						grid [temp].check = false;
-						if (!findGround (grid [data.rightIndex])) {
-							doesntHaveGroundAnySide = true;
-						}
-					}
-				}
-				if (data.down) {
-					if (grid [data.downIndex].full) {
-						grid [temp].check = false;
-						if (!findGround (grid [data.downIndex])) {
-							doesntHaveGroundAnySide = true;
-						}
-					}
-				}
-				if (data.up) {
-					if (grid [data.upIndex].full) {
-						grid [temp].check = false;
-						if (!findGround (grid [data.upIndex])) {
-							doesntHaveGroundAnySide = true;
-						}
-					}
-				}
-
-				if (!doesntHaveGroundAnySide) {
+				if (!testBlockDestroy(temp)) {
 					if (!displayOnly) {
 						Debug.Log (Mathf.FloorToInt ((grid [temp].obj.GetComponent<BaseObject> ().cost + 1) / 2));
 						int scrapToGen = Mathf.FloorToInt ((grid [temp].obj.GetComponent<BaseObject> ().cost + 1) / 2);
 						for (int a = 0; a < scrapToGen; a++) {
 							GameObject.Instantiate (scrapPrefab, cursor.transform.position, transform.rotation);
 						}
-						if (destroyObj (temp) == 1) {
+						destroyObjsAbove (temp);
+						//grid [temp].check = true;
+						if (grid[temp].indexAB.y >= maxHeight)
+						{
 							findMaxHeight ();
 						}
 						GameObject.FindObjectOfType<checkWithinCamera> ().testSections ();
@@ -369,11 +377,16 @@ public class GridBuilding : MonoBehaviour {
 				int rotation = currentRotation;
 				rot.z = rotation * 90;
 				overlay.transform.rotation = Quaternion.Euler (rot);
-				overlay.transform.position = new Vector3 (grid [temp].xy.x, grid [temp].xy.y, 0);
+				overlay.transform.position = new Vector3 (grid [temp].xy.x, grid [temp].xy.y, -9);
 
 				if (currentObj == 3) {
 					overlay.GetComponent<SpriteRenderer> ().sprite = scrapPrefab.GetComponentInChildren<SpriteRenderer> ().sprite;
 					overlay.SetActive (true);
+					if (!testBlockDestroy(temp)) {
+						overlay.GetComponent<SpriteRenderer> ().color = Color.green;
+					} else {
+						overlay.GetComponent<SpriteRenderer> ().color = Color.red;
+					}
 				} else {
 					overlay.GetComponent<SpriteRenderer> ().sprite = obj [currentObj].GetComponent<SpriteRenderer> ().sprite;
 					if (currentObj != 2) {
@@ -671,7 +684,7 @@ public class GridBuilding : MonoBehaviour {
 					offset.x = offsetTemp;
 					break;
 				}
-				offset = new Vector3 (offset.x * size.x, offset.y * size.y, 1);
+				//offset = new Vector3 (offset.x * size.x, offset.y * size.y, 1);
 				grid[_index].obj.transform.position += offset;
 			}
 

@@ -500,7 +500,7 @@ public class MultiInputEditor : Editor {
 			if (GUILayout.Button ("Close Misc Buttons")) {
 				state.FindPropertyRelative ("displayMiscButtons").boolValue = false;
 			}
-			labelWithProperty ("Xbox Guide", 140, selectedVars.GetArrayElementAtIndex (4), true, true, 2);
+			labelWithProperty ("Xbox Back", 140, selectedVars.GetArrayElementAtIndex (4), true, true, 2);
 
 			labelWithProperty ("Xbox Start", 140, selectedVars.GetArrayElementAtIndex (5), true, true, 2);
 

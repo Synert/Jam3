@@ -36,9 +36,21 @@ public class CameraScript : MonoBehaviour {
 
 		speed = GridManager.GetMaxHeight () + 5;
 		
-		Vector3 tempPos = transform.position;
+		transform.position = checkPos(transform.position);
 
     }
+
+	Vector3 checkPos(Vector3 pos) {
+		if(pos.y < lowestPoint)
+		{
+			pos.y = lowestPoint;
+		}
+		if(pos.y > GridManager.GetMaxHeight() * GridManager.GetSegmentHeight())
+		{
+			pos.y = GridManager.GetMaxHeight() * GridManager.GetSegmentHeight();
+		}
+		return pos;
+	}
 	
 	void TriggerInput(variableData _var)
 	{

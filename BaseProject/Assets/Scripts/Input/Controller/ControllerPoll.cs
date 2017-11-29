@@ -47,7 +47,7 @@ public class controllerButtonData {
 		testButton (state.Buttons.B, previousState.Buttons.B, out conData.controllerVariables [1]);
 		testButton (state.Buttons.X, previousState.Buttons.X, out conData.controllerVariables [2]);
 		testButton (state.Buttons.Y, previousState.Buttons.Y, out conData.controllerVariables [3]);
-		testButton (state.Buttons.Guide, previousState.Buttons.Guide, out conData.controllerVariables [4]);
+		testButton (state.Buttons.Back, previousState.Buttons.Back, out conData.controllerVariables [4]);
 		testButton (state.Buttons.Start, previousState.Buttons.Start, out conData.controllerVariables [5]);
 		testButton (state.Buttons.RightStick, previousState.Buttons.RightStick, out conData.controllerVariables [6]);
 		testButton (state.Buttons.RightShoulder, previousState.Buttons.RightShoulder, out conData.controllerVariables [7]);
