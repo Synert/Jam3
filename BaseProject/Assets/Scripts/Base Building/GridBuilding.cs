@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class GridBuilding : MonoBehaviour {
 
@@ -22,9 +23,16 @@ public class GridBuilding : MonoBehaviour {
 	public int state = 0;
     public GameObject audios;
 
+    Image[] highlight;
+
     // Use this for initialization
     void Start()
     {
+        highlight = new Image[3];
+        highlight[0] = GameObject.FindGameObjectWithTag("NormalBG").GetComponent<Image>();
+        highlight[1] = GameObject.FindGameObjectWithTag("ArmorBG").GetComponent<Image>();
+        highlight[2] = GameObject.FindGameObjectWithTag("GunBG").GetComponent<Image>();
+
         audios = GameObject.Find("AudioObject");
         cursor = GameObject.FindObjectOfType<MoveCursor>().gameObject;
 		gameover = GetComponent<Gameover>();
@@ -79,7 +87,7 @@ public class GridBuilding : MonoBehaviour {
 
 	void controllerOptions()
 	{
-		int cost = 0;
+        int cost = 0;
 		if (currentObj < obj.Length) {
 			if (obj [currentObj].GetComponent<BaseObject> ()) {
 				cost = obj [currentObj].GetComponent<BaseObject> ().cost;
@@ -214,7 +222,17 @@ public class GridBuilding : MonoBehaviour {
 	// Update is called once per frame
 	void Update()
 	{
-		GetComponent<LineRenderer>().enabled = enableLineRenderer;
+        for (int i = 0; i < 3; i++)
+        {
+            highlight[i].color = new Color(0.77254902f, 0.74901960784f, 0.74901960784f, 1.0f);
+        }
+
+        if(currentObj >= 0 && currentObj < 3)
+        {
+            highlight[currentObj].color = new Color(0.95f, 0.55f, 0.3f, 1.0f);
+        }
+
+        GetComponent<LineRenderer>().enabled = enableLineRenderer;
 		if (Input.GetMouseButton(0))
 		{
 			int temp = test(Camera.main.ScreenToWorldPoint(Input.mousePosition));
