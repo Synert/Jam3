@@ -120,40 +120,33 @@ public class GridBuilding : MonoBehaviour {
 
 	void controllerOptions()
 	{
-		int cost = 0;
-		if (currentObj < obj.Length) {
-			if (obj [currentObj].GetComponent<BaseObject> ()) {
-				cost = obj [currentObj].GetComponent<BaseObject> ().cost;
-			}
-		}
-		if (GameObject.FindObjectOfType<Recycle> ().Money >= cost)
-		{
-			int temp = test (cursor.transform.position);
-			if (temp != -1)
-			{
-				if (grid[temp].full == false)
-				{
-					if (currentObj == 0)
-					{
-						BuildBlock();
-					}
-					if (currentObj == 1)
-					{
-						BuildArmour ();
-					}
-					if (currentObj == 2) 
-					{
-						BuildTurret();
-					}
+		if (Time.timeScale == 1) {
+			int cost = 0;
+			if (currentObj < obj.Length) {
+				if (obj [currentObj].GetComponent<BaseObject> ()) {
+					cost = obj [currentObj].GetComponent<BaseObject> ().cost;
 				}
 			}
-			if (currentObj == 3)
-			{
-				if (temp != -1)
-				{
-					if (grid[temp].full == true)
-					{
-						DestroyBlock();
+			if (GameObject.FindObjectOfType<Recycle> ().Money >= cost) {
+				int temp = test (cursor.transform.position);
+				if (temp != -1) {
+					if (grid [temp].full == false) {
+						if (currentObj == 0) {
+							BuildBlock ();
+						}
+						if (currentObj == 1) {
+							BuildArmour ();
+						}
+						if (currentObj == 2) {
+							BuildTurret ();
+						}
+					}
+				}
+				if (currentObj == 3) {
+					if (temp != -1) {
+						if (grid [temp].full == true) {
+							DestroyBlock ();
+						}
 					}
 				}
 			}
@@ -281,6 +274,7 @@ public class GridBuilding : MonoBehaviour {
 			}
 		}
         GetComponent<LineRenderer>().enabled = enableLineRenderer;
+		/*
 		if (Input.GetMouseButton(0))
 		{
 			int temp = test(Camera.main.ScreenToWorldPoint(Input.mousePosition));
@@ -311,10 +305,10 @@ public class GridBuilding : MonoBehaviour {
 		if (Input.GetMouseButtonDown(2))
 		{
 
-			/*
+			
             fillHole ();
             GameObject.FindObjectOfType<checkWithinCamera> ().testSections ();
-			*/
+			
 
 			int temp = test(Camera.main.ScreenToWorldPoint(Input.mousePosition));
 			if (temp != -1)
@@ -330,6 +324,7 @@ public class GridBuilding : MonoBehaviour {
 			}
 
 		}
+		*/
 
 		if (!displayOnly) {
 			overlayScrap ();

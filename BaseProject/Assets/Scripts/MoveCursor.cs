@@ -16,6 +16,15 @@ public class MoveCursor : MonoBehaviour {
 		if (Time.timeScale == 1) {
 			GridBuilding builder = GameObject.FindObjectOfType<GridBuilding> ();
 			Vector3 transOffset = transform.position + (new Vector3 (data.state.ThumbStickLeft.inputs.x, data.state.ThumbStickLeft.inputs.y, 0) * speed);
+			GameObject.FindObjectOfType<TestInput> ().controller = true;
+			Debug.Log (data.state.ThumbStickLeft.inputs.x);
+			if (transOffset == transform.position) {
+				if (data.multiAxisValue.x != 0 || data.multiAxisValue.y != 0) {
+					transOffset = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+					transOffset.z = 0;
+					GameObject.FindObjectOfType<TestInput> ().controller = false;
+				}
+			}
 			if (transOffset.x < builder.startPos.x - maxDistSide) {
 				transOffset.x = builder.startPos.x - maxDistSide;
 			}

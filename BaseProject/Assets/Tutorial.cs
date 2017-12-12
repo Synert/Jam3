@@ -8,10 +8,8 @@ public class Tutorial : MonoBehaviour {
 	public float originalTimer;
 	public float timer;
 	public bool isNotTutorial;
-
-	void Start() {
-		originalTimer = timer;
-	}
+	public GameObject[] tutorials;
+	public GameObject tutorialLink;
 
 	void Update() {
 		if (!isNotTutorial) {
@@ -28,25 +26,35 @@ public class Tutorial : MonoBehaviour {
 			sr.enabled = false;
 			GetComponent<Text> ().enabled = false;
 		}
+		if (GetComponent<Text> ()) {
+			GetComponent<Text> ().enabled = false;
+		}
 	}
 
 	public void reactivate() {
+		gameObject.SetActive (true);
 		timer = originalTimer;
+		enabled = true;
 		SpriteRenderer[] temp = GetComponentsInChildren<SpriteRenderer> ();
 		foreach (SpriteRenderer sr in temp) {
 			sr.enabled = true;
 			GetComponent<Text> ().enabled = true;
 		}
+		if (GetComponent<Text> ()) {
+			GetComponent<Text> ().enabled = true;
+		}
+	}
+
+	public void grabLinkTime() {
+		timer = tutorialLink.GetComponent<Tutorial> ().timer;
+		tutorialLink.SetActive (false);
 	}
 
 	void reactivateAgain() {
-		Tutorial[] all = GameObject.FindObjectsOfType<Tutorial> ();
-		foreach (Tutorial tut in all) {
-			tut.reactivate ();
-		}
-		GenerateStartingScrap temp = GameObject.FindObjectOfType<GenerateStartingScrap> ();
-		if (temp) {
-			temp.reactivate ();
+		foreach (GameObject obj in tutorials) {
+			if (obj.GetComponent<Tutorial> ()) {
+				obj.GetComponent<Tutorial> ().reactivate ();
+			}
 		}
 	}
 }

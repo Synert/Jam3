@@ -85,6 +85,29 @@ public class CameraScript : MonoBehaviour {
 
 		cursor.transform.position = new Vector3 (cursor.transform.position.x, Camera.main.transform.position.y - yVal, 0);
     }
+
+	void KeyboardInput(variableData _var)
+	{
+		float yVal = Camera.main.transform.position.y - cursor.transform.position.y;
+		Vector3 tempPos = transform.position;
+
+		tempPos.y += _var.f * speed * Time.deltaTime;
+
+		transform.position = tempPos;
+
+		if(tempPos.y < lowestPoint)
+		{
+			tempPos.y = lowestPoint;
+		}
+		if(tempPos.y > GridManager.GetMaxHeight() * GridManager.GetSegmentHeight())
+		{
+			tempPos.y = GridManager.GetMaxHeight() * GridManager.GetSegmentHeight();
+		}
+
+		transform.position = tempPos;
+
+		cursor.transform.position = new Vector3 (cursor.transform.position.x, Camera.main.transform.position.y - yVal, 0);
+	}
 	
 	//right bumper
 	void SnapTop()

@@ -8,6 +8,10 @@ public class ControllerPoll : MonoBehaviour {
 	public bool[] Controllers = { false, false, false, false };
 	public controllerButtonData[] ControllerData = new controllerButtonData[4];
 
+	void Start () {
+		Update ();
+	}
+
 	// Update is called once per frame
 	void Update () {
 		for (int a = 0; a < 4; a++) {
